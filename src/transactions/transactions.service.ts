@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { getTopTransaction, getUserBalanceByUsername, isCurrencyMatch, queryTopUsers } from '../helper/transaction-helper';
+import { query } from 'express';
 
 @Injectable()
 export class TransactionsService {
@@ -11,17 +13,27 @@ export class TransactionsService {
     const { username_from, username_to, currency_id, amount, type } = createTransactionDto;
     var notes = createTransactionDto.notes;
 
+    const getCurrency = await this.prisma.currency.findUnique({
+      where: {
+        id: currency_id,
+      },
+    });
+
     const getUserFrom = await this.prisma.user.findUnique({
       where: {
         username: username_from,
       },
     });
 
+    //TODO get user from token
     if (!getUserFrom) {
       throw new Error('User not found');
     }
 
-    const getUserTo = await this.prisma.user.findUnique({
+
+   await isCurrencyMatch(getUserFrom.username, getCurrency.name);
+  
+  const getUserTo = await this.prisma.user.findUnique({
       where: {
         username: username_to,
       },
@@ -35,8 +47,8 @@ export class TransactionsService {
       throw new Error('User cannot send money to themselves');
     }
 
-    if (amount <= 0) {
-      throw new Error('Amount must be greater than 0');
+    if (amount <= 0 && amount > 10000000) {
+      throw new Error('Amount must be greater than 0 and less than 10000000');
     }
 
     if(type !== 'credit' && type !== 'debit') {
@@ -83,6 +95,7 @@ export class TransactionsService {
     const { username_to, currency_id, amount, type } = createTransactionDto;
     var notes = createTransactionDto.notes;
 
+    //TODO get user from token
     const getUser = await this.prisma.user.findUnique({
       where: {
         username: username_to,
@@ -119,6 +132,71 @@ export class TransactionsService {
     });
 
     return topupTransaction;
+  }
+
+  async getBalance() {
+    //TODO get user from token
+    const getUser = await this.prisma.user.findUnique({
+      where: {
+        username: 'john_doe',
+      },
+    });
+
+    if (!getUser) {
+      throw new Error('User not found');
+    }
+
+    const balance = await getUserBalanceByUsername(getUser.username);
+    const result = balance.map((item) => {
+      return {
+        currency: item.currency_name,
+        balance: item.total_amount,
+      };
+    });
+
+    return result;
+  }
+
+  async getTopUsers() {
+    try {
+      const currency = await this.prisma.currency.findMany();
+      let response = [];
+      for (const curr of currency) {
+        const topUsers = await queryTopUsers(curr.name);
+        response.push([
+          {
+            currency: curr.name,
+            top_users: topUsers,
+          }
+        ])
+      }
+
+      return response;
+    } catch (error) {
+      console.error('Error in getTopUsers:', error);
+      throw new Error('Error fetching top users');
+    }  
+  }
+
+  async getTopTransactions(username: string) {
+    try {
+      const currency = await this.prisma.currency.findMany();
+      let response = [];
+      for (const curr of currency) {
+        const topTransactions = await getTopTransaction(username,curr.name);
+        response.push([
+          {
+            currency: curr.name,
+            top_transactions: topTransactions
+          }
+        ])
+      }
+      
+      return response;
+    } catch (error) {
+      console.error('Error in getTopUsers:', error);
+      throw new Error('Error fetching top users');
+    }  
   }
 
 

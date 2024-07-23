@@ -5,7 +5,11 @@ export const userSelect = {
     include: {
       roles: {
         select: {
-          role: true,
+          role: {
+            select: {
+              name: true,
+            },
+          }
         },
       },
     },
