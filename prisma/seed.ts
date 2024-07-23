@@ -12,13 +12,13 @@ async function main() {
   // Create Roles
   const roleAdmin = await prisma.role.create({
     data: {
-      name: 'Admin',
+      name: 'Admin',  // Using a string for the role name
     },
   });
 
   const roleUser = await prisma.role.create({
     data: {
-      name: 'User',
+      name: 'User',  // Using a string for the role name
     },
   });
 
@@ -27,8 +27,8 @@ async function main() {
     data: {
       username: 'john_doe',
       password: hashedPassword,
-      wallet_address: 'wallet123',
-      wallet_balance: 0.5,
+      created_at: new Date(),
+      updated_at: new Date(),
       roles: {
         create: {
           role: {
@@ -43,8 +43,8 @@ async function main() {
     data: {
       username: 'jane_doe',
       password: hashedPassword,
-      wallet_address: 'wallet456',
-      wallet_balance: 1.2,
+      created_at: new Date(),
+      updated_at: new Date(),
       roles: {
         create: {
           role: {
@@ -56,6 +56,13 @@ async function main() {
   });
 
   // Create Currency
+  const currencyUSD = await prisma.currency.create({
+    data: {
+      name: 'USD',
+    },
+  });
+
+
   const currencyBTC = await prisma.currency.create({
     data: {
       name: 'Bitcoin',
@@ -71,32 +78,24 @@ async function main() {
   // Create Transactions
   await prisma.transaction.create({
     data: {
-      user: {
-        connect: { id: user1.id },
-      },
-      currency: {
-        connect: { id: currencyBTC.id },
-      },
+      user_id: user1.id,
+      currency_id: currencyBTC.id,
       amount: 0.5,
-      type: 'deposit',
-      wallet_address_from: 'external_wallet_1',
-      wallet_address_to: 'wallet123',
+      type: 'Credit',
+      from_user_id: null,
+      to_user_id: user1.id,
       notes: 'Deposit from external wallet to john_doe\'s wallet',
     },
   });
 
   await prisma.transaction.create({
     data: {
-      user: {
-        connect: { id: user2.id },
-      },
-      currency: {
-        connect: { id: currencyETH.id },
-      },
-      amount: 1.2,
-      type: 'transfer',
-      wallet_address_from: 'wallet456',
-      wallet_address_to: 'wallet123',
+      user_id: user2.id,
+      currency_id: currencyETH.id,
+      amount: -1.2,
+      type: 'Debit',
+      from_user_id: user2.id,
+      to_user_id: user1.id,
       notes: 'Transfer from jane_doe to john_doe',
     },
   });

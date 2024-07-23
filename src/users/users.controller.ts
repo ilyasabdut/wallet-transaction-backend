@@ -1,0 +1,97 @@
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus} from '@nestjs/common';
+import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { UserEntity } from './entities/user.entity';
+import {Response} from 'express';
+
+@Controller('users')
+@ApiTags('Users')
+
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Post()
+  @ApiCreatedResponse({ type: UserEntity })
+  async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
+    try{
+      const user = await this.usersService.create(createUserDto);
+      return res.status(HttpStatus.CREATED).json({
+        statusCode: HttpStatus.CREATED,
+        message: 'User created successfully',
+        data: user,
+      });
+    }catch(error){
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: error.message,
+      });
+    }
+  }
+
+  @Get()
+  @ApiOkResponse({ type: UserEntity, isArray: true })
+  findAll(@Res() res: Response) {
+    var users = this.usersService.findAll();
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      message: 'Users found successfully',
+      data: users,
+    })
+  }
+
+  @Get(':id')
+  @ApiOkResponse({ type: UserEntity, isArray: true })
+  async findOne(@Param('id') id: string ,  @Res() res: Response) {
+    try {
+      var user = await this.usersService.findOne(+id);
+      return res.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'User found successfully',
+        data: user,
+      })
+    } catch (error) {
+      res.status(HttpStatus.BAD_REQUEST).json({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: error.message,
+      })
+    }
+  }
+
+  @Patch(':id')
+  @ApiOkResponse({ type: UserEntity, isArray: true })
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Res() res: Response) {
+    try {
+      var user = await this.usersService.update(+id, updateUserDto);
+      return res.status(HttpStatus.CREATED).json({
+        statusCode: HttpStatus.CREATED,
+        message: 'User updated successfully',
+        data: user,
+      })
+    } catch (error) {
+      res.status(HttpStatus.BAD_REQUEST).json({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: error.message,
+      });
+    }
+  }
+
+  @Delete(':id')
+  @ApiOkResponse({ type: UserEntity, isArray: true })
+  async remove(@Param('id') id: string , @Res() res: Response) {
+    try {
+      var user = await this.usersService.remove(+id);
+      return res.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'User deleted successfully',
+        data: user,
+      })
+    } catch (error) {
+      res.status(HttpStatus.BAD_REQUEST).json({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: error.message,
+      });
+    }
+  }
+}

@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
 }
 
 datasource db {
@@ -14,16 +15,14 @@ datasource db {
 }
 
 model User {
-  id             Int             @id @default(autoincrement())
-  username       String          @db.VarChar(255)
-  password       String          @db.VarChar(255)
-  wallet_address String          @db.VarChar(255)
-  wallet_balance Float           @default(0.0)
-  created_at     DateTime        @default(now())
-  updated_at     DateTime        @updatedAt
-  deleted_at     DateTime?
-  roles          UserRolePivot[]
-  transactions   Transaction[]
+  id          Int             @id @default(autoincrement())
+  username    String          @unique
+  password    String          @db.VarChar(255)
+  created_at  DateTime        @default(now())
+  updated_at  DateTime        @updatedAt
+  deleted_at  DateTime?
+  roles       UserRolePivot[]
+  transaction Transaction[]
 }
 
 model UserRolePivot {
@@ -33,42 +32,42 @@ model UserRolePivot {
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
-  
+
   user User @relation(fields: [user_id], references: [id])
   role Role @relation(fields: [role_id], references: [id])
 }
 
 model Role {
-  id         Int       @id @default(autoincrement())
-  name       String    @db.VarChar(255)
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
+  id         Int             @id @default(autoincrement())
+  name       String          @unique
+  created_at DateTime        @default(now())
+  updated_at DateTime        @updatedAt
   deleted_at DateTime?
   users      UserRolePivot[]
 }
 
 model Transaction {
-  id                 Int       @id @default(autoincrement())
-  user_id            Int
-  currency_id        Int
-  amount             Float
-  type               String    @db.VarChar(255)
-  wallet_address_from String    @db.VarChar(255)
-  wallet_address_to   String    @db.VarChar(255)
-  notes              String?   @db.VarChar(255)
-  created_at         DateTime  @default(now())
-  updated_at         DateTime  @updatedAt
-  deleted_at         DateTime?
+  id           Int       @id @default(autoincrement())
+  user_id      Int
+  currency_id  Int
+  amount       Float
+  type         String    @db.VarChar(255)
+  from_user_id Int?
+  to_user_id   Int
+  notes        String?   @db.VarChar(255)
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
 
   user     User     @relation(fields: [user_id], references: [id])
   currency Currency @relation(fields: [currency_id], references: [id])
 }
 
 model Currency {
-  id         Int       @id @default(autoincrement())
-  name       String    @db.VarChar(255)
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  deleted_at DateTime?
+  id           Int           @id @default(autoincrement())
+  name         String        @db.VarChar(255)
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @updatedAt
+  deleted_at   DateTime?
   transactions Transaction[]
 }
