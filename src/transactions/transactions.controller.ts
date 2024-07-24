@@ -33,9 +33,9 @@ export class TransactionsController {
 
   @Post('topup')
   @ApiCreatedResponse({ type: TransactionEntity })
-  topup(@Body() createTransactionDto: CreateTransactionDto,  @Res() res: Response) {
+  async topup(@Body() createTransactionDto: CreateTransactionDto,  @Res() res: Response) {
     try {
-      const transaction = this.transactionsService.topup(createTransactionDto);
+      const transaction = await this.transactionsService.topup(createTransactionDto);
       return res.status(HttpStatus.CREATED).json({
         statusCode: HttpStatus.CREATED,
         message: 'Top Up successful',
@@ -105,25 +105,24 @@ export class TransactionsController {
         });
       }
     }
-  
+    
+  // @Get()
+  // findAll() {
+  //   return this.transactionsService.findAll();
+  // }
 
-  @Get()
-  findAll() {
-    return this.transactionsService.findAll();
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.transactionsService.findOne(+id);
+  // }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.transactionsService.findOne(+id);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateTransactionDto: UpdateTransactionDto) {
+  //   return this.transactionsService.update(+id, updateTransactionDto);
+  // }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTransactionDto: UpdateTransactionDto) {
-    return this.transactionsService.update(+id, updateTransactionDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.transactionsService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.transactionsService.remove(+id);
+  // }
 }

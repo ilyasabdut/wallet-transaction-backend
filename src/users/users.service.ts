@@ -1,22 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { userSelect } from 'src/prisma/prisma.selects';
+import { UserRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private userRepo: UserRepository
+  ) {}
 
  async create(createUserDto: CreateUserDto) {
     const { username, password, role } = createUserDto;
 
-    const getUser = await this.prisma.user.findUnique({
-      where: {
-        username: username,
-      },
-    });
+    const getUser = await this.findOne(username)
 
     if (getUser) {
       throw new Error('User already exists');
@@ -24,52 +21,28 @@ export class UsersService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const getRole = await this.prisma.role.findUnique({
-      where: {
-        name: role,
-      },
-    });
+    const getRole = await this.userRepo.getRoleByName(role)
 
     if (!getRole) {
       throw new Error('Role not found');
     }
-    const user = await this.prisma.user.create({
-      data: {
-        username: username,
-        password: hashedPassword,
-        created_at: new Date(),
-        updated_at: new Date(),
-        roles: {
-          create: {
-            role: {
-              connect: { id: getRole.id },
-            },
-          },
-        },
-      },
-      ...userSelect,
+    
+    const user = await this.userRepo.createUser({
+      username: username,
+      password: hashedPassword,
+      role: getRole.id,
     });
+
     return user;
   }
 
-  findAll() {
-    const user =  this.prisma.user.findMany({
-      where: {
-        deleted_at: null,
-      },
-      ...userSelect,
-    });
-    return user;
+  async findAll() {
+    const users = await this.userRepo.getAllUsers();
+    return users;
   }
 
-  async findOne(id: number) {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id: id,
-        deleted_at: null,
-      },
-      ...userSelect,
-    });
+  async findOne(username: string) {
+    const user = await this.userRepo.getUserByUsername(username)
 
     if (!user) {
       throw new Error('User not found');
@@ -80,6 +53,11 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     const { username, password, role } = updateUserDto;
+    const getUser = await this.findOne(username)
+
+    if (!getUser) {
+      throw new Error('User not exists');
+    }
 
     let hashedPassword: string | undefined;
     if (password) {
@@ -88,46 +66,24 @@ export class UsersService {
 
     let getRole;
     if (role) {
-      getRole = await this.prisma.role.findUnique({
-        where: { name: role },
-      });
+      getRole = await this.userRepo.getRoleByName(role)
 
       if (!getRole) {
         throw new Error('Role not found');
       }
     }
 
-    const user = await this.prisma.user.update({
-      where: { id },
-      data: {
-        username,
-        password: hashedPassword,
-        updated_at: new Date(),
-        roles: getRole
-          ? {
-              deleteMany: {}, // Clear existing roles
-              create: {
-                role: {
-                  connect: { id: getRole.id },
-                },
-              },
-            }
-          : undefined,
-      },
-      ...userSelect,
+    const user = await this.userRepo.updateUser(id, {
+      username: username,
+      password: hashedPassword,
+      role: getRole?.id,
     });
 
     return  user;
   }
 
    remove(id: number) {
-    const user = this.prisma.user.update({
-      where: { id: id, deleted_at: null },
-      data: {
-        deleted_at: new Date(),
-      },
-      ...userSelect,
-    });
+    const user = this.userRepo.deleteUser(id);
 
     if (!user) {
       throw new Error('User not found');

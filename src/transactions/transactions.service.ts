@@ -1,43 +1,38 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { getTopTransaction, getUserBalanceByUsername, isCurrencyMatch, queryTopUsers } from '../helper/transaction-helper';
-import { query } from 'express';
+import { TransactionRepository } from './transaction.repository';
+import { CurrenciesService } from 'src/masterdatas/currencies/currencies.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class TransactionsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private readonly currencyService: CurrenciesService,
+    private readonly userService: UsersService,
+    private readonly transactionRepo: TransactionRepository
+  ) {}
 
   async create(createTransactionDto: CreateTransactionDto) {
     const { username_from, username_to, currency_id, amount, type } = createTransactionDto;
     var notes = createTransactionDto.notes;
 
-    const getCurrency = await this.prisma.currency.findUnique({
-      where: {
-        id: currency_id,
-      },
-    });
+    const getCurrency = await this.currencyService.findOne(currency_id)
 
-    const getUserFrom = await this.prisma.user.findUnique({
-      where: {
-        username: username_from,
-      },
-    });
+    //TODO get user from token
+    if (!getCurrency) {
+      throw new Error('Currency not found');
+    }
+    
+    const getUserFrom = await this.userService.findOne(username_from)
 
     //TODO get user from token
     if (!getUserFrom) {
       throw new Error('User not found');
     }
 
-
-   await isCurrencyMatch(getUserFrom.username, getCurrency.name);
   
-  const getUserTo = await this.prisma.user.findUnique({
-      where: {
-        username: username_to,
-      },
-    });
+    const getUserTo = await this.userService.findOne(username_to)
 
     if (!getUserTo) {
       throw new Error('User not found');
@@ -51,16 +46,18 @@ export class TransactionsService {
       throw new Error('Amount must be greater than 0 and less than 10000000');
     }
 
+    await this.transactionRepo.isCurrencyMatch(getUserFrom.username, getCurrency.name, amount);
+
+
     if(type !== 'credit' && type !== 'debit') {
       throw new Error('Type must be credit or debit or topup');
     }
 
     if(!notes){
-        notes = 'Transaction from ' + getUserFrom.username + 'to ' + getUserTo.username;
+        notes = 'Transaction from ' + getUserFrom.username + ' to ' + getUserTo.username;
     }
     // Debit for the sender
-    const debitTransaction = await this.prisma.transaction.create({
-      data: {
+    const debitTransaction = await this.transactionRepo.createTransaction({
         user_id: getUserFrom.id,
         from_user_id: getUserFrom.id,
         to_user_id: getUserTo.id,
@@ -70,12 +67,10 @@ export class TransactionsService {
         notes: notes,
         created_at: new Date(),
         updated_at: new Date(),
-      },
     });
 
     // Credit for the receiver
-    const creditTransaction = await this.prisma.transaction.create({
-      data: {
+    const creditTransaction = await this.transactionRepo.createTransaction({
         user_id: getUserTo.id,
         from_user_id: getUserFrom.id,
         to_user_id: getUserTo.id,
@@ -85,7 +80,6 @@ export class TransactionsService {
         notes: notes,
         created_at: new Date(),
         updated_at: new Date(),
-      },
     });
 
     return { debitTransaction, creditTransaction };
@@ -96,17 +90,13 @@ export class TransactionsService {
     var notes = createTransactionDto.notes;
 
     //TODO get user from token
-    const getUser = await this.prisma.user.findUnique({
-      where: {
-        username: username_to,
-      },
-    });
+    const getUser = await this.userService.findOne(username_to)
 
     if (!getUser) {
       throw new Error('User not found');
     }
 
-    if (amount <= 0 || amount < 10000000) {
+    if (amount <= 0 && amount > 10000000) {
       throw new Error('Amount must be greater than 0 and less than 10000000');
     }
 
@@ -118,9 +108,9 @@ export class TransactionsService {
         notes = 'Top up balance to ' + getUser.username;
     }
 
-    const topupTransaction = await this.prisma.transaction.create({
-      data: {
+    const topupTransaction = await this.transactionRepo.createTransaction({
         user_id: getUser.id,
+        from_user_id: null,
         to_user_id: getUser.id,
         currency_id: currency_id,
         amount: amount,
@@ -128,7 +118,6 @@ export class TransactionsService {
         notes: notes,
         created_at: new Date(),
         updated_at: new Date(),
-      },
     });
 
     return topupTransaction;
@@ -136,17 +125,13 @@ export class TransactionsService {
 
   async getBalance() {
     //TODO get user from token
-    const getUser = await this.prisma.user.findUnique({
-      where: {
-        username: 'john_doe',
-      },
-    });
+    const getUser = await this.userService.findOne('john_doe')
 
     if (!getUser) {
       throw new Error('User not found');
     }
 
-    const balance = await getUserBalanceByUsername(getUser.username);
+    const balance = await this.transactionRepo.getUserBalanceByUsername(getUser.username);
     const result = balance.map((item) => {
       return {
         currency: item.currency_name,
@@ -159,16 +144,16 @@ export class TransactionsService {
 
   async getTopUsers() {
     try {
-      const currency = await this.prisma.currency.findMany();
+      const currency = await this.currencyService.findAll();
       let response = [];
       for (const curr of currency) {
-        const topUsers = await queryTopUsers(curr.name);
-        response.push([
+        const topUsers = await this.transactionRepo.queryTopUsers(curr.name);
+        response.push(
           {
             currency: curr.name,
             top_users: topUsers,
           }
-        ])
+        )
       }
 
       return response;
@@ -180,16 +165,14 @@ export class TransactionsService {
 
   async getTopTransactions(username: string) {
     try {
-      const currency = await this.prisma.currency.findMany();
+      const currency = await this.currencyService.findAll();
       let response = [];
       for (const curr of currency) {
-        const topTransactions = await getTopTransaction(username,curr.name);
-        response.push([
-          {
-            currency: curr.name,
-            top_transactions: topTransactions
-          }
-        ])
+        const topTransactions = await this.transactionRepo.getTopTransaction(username,curr.name);
+        response.push({
+          currency: curr.name,
+          top_transactions: topTransactions,
+        });
       }
       
       return response;
@@ -199,20 +182,19 @@ export class TransactionsService {
     }  
   }
 
+  // findAll() {
+  //   return `This action returns all transactions`;
+  // }
 
-  findAll() {
-    return `This action returns all transactions`;
-  }
+  // findOne(id: number) {
+  //   return `This action returns a #${id} transaction`;
+  // }
 
-  findOne(id: number) {
-    return `This action returns a #${id} transaction`;
-  }
+  // update(id: number, updateTransactionDto: UpdateTransactionDto) {
+  //   return `This action updates a #${id} transaction`;
+  // }
 
-  update(id: number, updateTransactionDto: UpdateTransactionDto) {
-    return `This action updates a #${id} transaction`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} transaction`;
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} transaction`;
+  // }
 }

@@ -32,8 +32,8 @@ export class UsersController {
 
   @Get()
   @ApiOkResponse({ type: UserEntity, isArray: true })
-  findAll(@Res() res: Response) {
-    var users = this.usersService.findAll();
+  async findAll(@Res() res: Response) {
+    var users = await this.usersService.findAll();
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
       message: 'Users found successfully',
@@ -41,11 +41,11 @@ export class UsersController {
     })
   }
 
-  @Get(':id')
+  @Get(':username')
   @ApiOkResponse({ type: UserEntity, isArray: true })
-  async findOne(@Param('id') id: string ,  @Res() res: Response) {
+  async findOne(@Param('username') username: string ,  @Res() res: Response) {
     try {
-      var user = await this.usersService.findOne(+id);
+      var user = await this.usersService.findOne(username);
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'User found successfully',
