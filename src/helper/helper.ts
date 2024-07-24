@@ -1,4 +1,4 @@
-export async function serializeBigInt(obj: any): Promise<any> {
+export function serializeBigInt(obj: any) {
   if (typeof obj === 'bigint') {
     return obj.toString(); // Convert BigInt to string
   } else if (Array.isArray(obj)) {

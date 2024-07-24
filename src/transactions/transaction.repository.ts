@@ -119,7 +119,6 @@ export class TransactionRepository {
           total_debit DESC
         LIMIT 10;
       `;
-
       return serializeBigInt(rawTopUsers);
     } catch (error) {
       console.error('Error fetching top users:', error);
