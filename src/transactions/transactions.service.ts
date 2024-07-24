@@ -128,6 +128,7 @@ export class TransactionsService {
     }
 
     const balance = await this.transactionRepo.getUserBalanceByUsername(getUser.username);
+    
     const result = balance.map((item) => {
       return {
         currency: item.currency_name,
@@ -162,6 +163,8 @@ export class TransactionsService {
   async getTopTransactions(username: string) {
     try {
       const currency = await this.currencyService.findAll();
+
+      const balance = await this.transactionRepo.getUserBalanceByUsername(username);
       let response = [];
       for (const curr of currency) {
         const topTransactions = await this.transactionRepo.getTopTransaction(username,curr.name);

@@ -5,6 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import {Response} from 'express';
+import { SkipAuth } from 'src/helper/helper';
 
 @Controller('users')
 @ApiTags('Users')
@@ -13,6 +14,8 @@ import {Response} from 'express';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  //TODO move into auth?
+  @SkipAuth()
   @Post()
   @ApiCreatedResponse({ type: UserEntity })
   async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {

@@ -46,10 +46,10 @@ export class TransactionRepository {
         SELECT
           usr.id,
           usr.username,
-          cur.name AS currency_name,
+          COALESCE(cur.name, 'EMPTY') AS currency_name,
           SUM(CASE WHEN tx.type = 'credit' THEN tx.amount ELSE 0 END) AS total_credit,
           SUM(CASE WHEN tx.type = 'debit' THEN tx.amount ELSE 0 END) AS total_debit,
-          SUM(tx.amount) AS total_amount
+          COALESCE(SUM(tx.amount), 0) AS total_amount
         FROM
           "User" AS usr
           LEFT JOIN "Transaction" AS tx ON tx.user_id = usr.id
@@ -102,7 +102,7 @@ export class TransactionRepository {
             )) DESC
           ) AS rank,
           usr.username,
-          cur.name AS currency_name,
+          COALESCE(cur.name, 'EMPTY') AS currency_name,
           ABS(SUM(
             CASE WHEN tx.type = 'debit' THEN tx.amount ELSE 0 END
           )) AS total_debit
@@ -130,9 +130,8 @@ export class TransactionRepository {
     try {
       const debitTransaction = await this.queryTopTransactionsDebit(username, currencyName);
       const creditTransaction = await this.queryTopTransactionsCredit(username, currencyName);
-
       return {
-        debit: debitTransaction,
+        debit: debitTransaction ,
         credit: creditTransaction,
       };
     } catch (error) {
