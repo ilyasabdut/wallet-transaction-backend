@@ -19,14 +19,12 @@ export class TransactionsService {
 
     const getCurrency = await this.currencyService.findOne(currency_id)
 
-    //TODO get user from token
     if (!getCurrency) {
       throw new Error('Currency not found');
     }
     
     const getUserFrom = await this.userService.findOne(username_from)
 
-    //TODO get user from token
     if (!getUserFrom) {
       throw new Error('User not found');
     }
@@ -89,7 +87,6 @@ export class TransactionsService {
     const { username_to, currency_id, amount, type } = createTransactionDto;
     var notes = createTransactionDto.notes;
 
-    //TODO get user from token
     const getUser = await this.userService.findOne(username_to)
 
     if (!getUser) {
@@ -124,7 +121,6 @@ export class TransactionsService {
   }
 
   async getBalance(username: string) {
-    //TODO get user from token
     const getUser = await this.userService.findOne(username)
 
     if (!getUser) {
