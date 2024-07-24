@@ -123,9 +123,9 @@ export class TransactionsService {
     return topupTransaction;
   }
 
-  async getBalance() {
+  async getBalance(username: string) {
     //TODO get user from token
-    const getUser = await this.userService.findOne('john_doe')
+    const getUser = await this.userService.findOne(username)
 
     if (!getUser) {
       throw new Error('User not found');

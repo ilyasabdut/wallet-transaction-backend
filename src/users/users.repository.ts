@@ -15,12 +15,17 @@ export class UserRepository {
     });
  }
     
- async getUserByUsername(username: string) {
+ async getUserByUsername(username: string, withPassword: boolean = false) {
+    if (withPassword) {
+        userSelect['omit'] = {
+            password: false,
+        };
+    }
   return this.prisma.user.findUnique({
     where: {
       username: username,
         },
-    ...userSelect,
+        ...userSelect,
     });
  }
 

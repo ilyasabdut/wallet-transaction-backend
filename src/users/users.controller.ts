@@ -2,12 +2,13 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus} fro
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import {Response} from 'express';
 
 @Controller('users')
 @ApiTags('Users')
+@ApiBearerAuth()
 
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

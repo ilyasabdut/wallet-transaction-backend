@@ -41,8 +41,8 @@ export class UsersService {
     return users;
   }
 
-  async findOne(username: string) {
-    const user = await this.userRepo.getUserByUsername(username)
+  async findOne(username: string, withPassword: boolean = false) {
+    const user = await this.userRepo.getUserByUsername(username, withPassword)
 
     if (!user) {
       throw new Error('User not found');

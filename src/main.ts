@@ -8,6 +8,7 @@ async function bootstrap() {
   app.enableCors();
 
   const config = new DocumentBuilder()
+  .addBearerAuth()
   .setTitle('Wallet Transaction API')
   .setDescription('The Wallet Transaction API description')
   .setVersion('0.1')

@@ -3,11 +3,12 @@ import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { TransactionEntity } from './entities/transaction.entity';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import {Response} from 'express';
 
 @Controller('transactions')
 @ApiTags('Transactions')
+@ApiBearerAuth()
 
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
@@ -50,11 +51,11 @@ export class TransactionsController {
   }
 
   //TODO update Entity
-  @Get('balance')
+  @Get('balance/:username')
   @ApiOkResponse({ type: TransactionEntity, isArray: true })
-  async getBalance(@Res() res: Response) {
+  async getBalance(@Param('username') username: string,@Res() res: Response) {
     try {
-      const balance = await this.transactionsService.getBalance();
+      const balance = await this.transactionsService.getBalance(username);
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'Balance found successfully',
@@ -105,24 +106,5 @@ export class TransactionsController {
         });
       }
     }
-    
-  // @Get()
-  // findAll() {
-  //   return this.transactionsService.findAll();
-  // }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.transactionsService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateTransactionDto: UpdateTransactionDto) {
-  //   return this.transactionsService.update(+id, updateTransactionDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.transactionsService.remove(+id);
-  // }
 }

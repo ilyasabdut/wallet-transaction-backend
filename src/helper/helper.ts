@@ -1,3 +1,6 @@
+import { SetMetadata } from '@nestjs/common';
+
+
 export function serializeBigInt(obj: any) {
   if (typeof obj === 'bigint') {
     return obj.toString(); // Convert BigInt to string
@@ -11,3 +14,7 @@ export function serializeBigInt(obj: any) {
     return obj;
   }
 }
+
+
+export const IS_PUBLIC_KEY = 'isPublic';
+export const SkipAuth = () => SetMetadata(IS_PUBLIC_KEY, true);
