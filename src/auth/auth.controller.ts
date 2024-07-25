@@ -31,10 +31,4 @@ export class AuthController {
         });
       }
   }
-
-  @Get('profile')
-  getProfile() {
-    return 'Profile';
-  }
-
 }
