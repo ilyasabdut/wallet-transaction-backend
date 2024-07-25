@@ -19,7 +19,7 @@ describe('AuthService', () => {
 
     jwtService = {
       signAsync: jest.fn(),
-    };  
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -74,7 +74,9 @@ describe('AuthService', () => {
 
       (usersService.findOne as jest.Mock).mockResolvedValue(user);
 
-      await expect(authService.signIn(username, password)).rejects.toThrow(UnauthorizedException);
+      await expect(authService.signIn(username, password)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should throw UnauthorizedException if user is not found', async () => {
@@ -83,7 +85,9 @@ describe('AuthService', () => {
 
       (usersService.findOne as jest.Mock).mockResolvedValue(null);
 
-      await expect(authService.signIn(username, password)).rejects.toThrow(UnauthorizedException);
+      await expect(authService.signIn(username, password)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 });

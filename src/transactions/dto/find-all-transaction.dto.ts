@@ -12,5 +12,4 @@ export class FindAllTransaction {
 
   @ApiProperty({ required: false })
   search?: string;
-
 }

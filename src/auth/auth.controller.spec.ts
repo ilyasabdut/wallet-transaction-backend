@@ -35,7 +35,10 @@ describe('AuthController', () => {
 
       await authController.signIn(signInDto, res as Response);
 
-      expect(authService.signIn).toHaveBeenCalledWith(signInDto.username, signInDto.password);
+      expect(authService.signIn).toHaveBeenCalledWith(
+        signInDto.username,
+        signInDto.password,
+      );
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         statusCode: 200,
@@ -45,16 +48,24 @@ describe('AuthController', () => {
     });
 
     it('should return an error on login failure', async () => {
-      const signInDto: SignInDto = { username: 'test', password: 'wrong-password' };
+      const signInDto: SignInDto = {
+        username: 'test',
+        password: 'wrong-password',
+      };
       const res: Partial<Response> = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn().mockReturnThis(),
       };
-      jest.spyOn(authService, 'signIn').mockRejectedValueOnce(new Error('Invalid credentials'));
+      jest
+        .spyOn(authService, 'signIn')
+        .mockRejectedValueOnce(new Error('Invalid credentials'));
 
       await authController.signIn(signInDto, res as Response);
 
-      expect(authService.signIn).toHaveBeenCalledWith(signInDto.username, signInDto.password);
+      expect(authService.signIn).toHaveBeenCalledWith(
+        signInDto.username,
+        signInDto.password,
+      );
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         statusCode: 400,

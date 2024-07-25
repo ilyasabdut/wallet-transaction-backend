@@ -9,9 +9,13 @@ import { UserRepository } from 'src/users/users.repository';
 
 @Module({
   controllers: [TransactionsController],
-  providers: [TransactionsService,TransactionRepository,
-    CurrenciesService,UsersService,UserRepository],
+  providers: [
+    TransactionsService,
+    TransactionRepository,
+    CurrenciesService,
+    UsersService,
+    UserRepository,
+  ],
   imports: [PrismaModule],
-
 })
 export class TransactionsModule {}

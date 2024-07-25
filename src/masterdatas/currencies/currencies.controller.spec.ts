@@ -23,7 +23,8 @@ describe('CurrenciesController', () => {
       ],
     }).compile();
 
-    currenciesController = module.get<CurrenciesController>(CurrenciesController);
+    currenciesController =
+      module.get<CurrenciesController>(CurrenciesController);
     currenciesService = module.get<CurrenciesService>(CurrenciesService);
 
     // Mocking the response object
@@ -36,8 +37,20 @@ describe('CurrenciesController', () => {
   describe('findAll', () => {
     it('should return a list of currencies on success', async () => {
       const result = [
-        { id: 1, name: 'USD', created_at: new Date(), updated_at: new Date(), deleted_at: null },
-        { id: 2, name: 'EUR', created_at: new Date(), updated_at: new Date(), deleted_at: null },
+        {
+          id: 1,
+          name: 'USD',
+          created_at: new Date(),
+          updated_at: new Date(),
+          deleted_at: null,
+        },
+        {
+          id: 2,
+          name: 'EUR',
+          created_at: new Date(),
+          updated_at: new Date(),
+          deleted_at: null,
+        },
       ];
 
       (currenciesService.findAll as jest.Mock).mockResolvedValue(result);
@@ -55,7 +68,9 @@ describe('CurrenciesController', () => {
 
     it('should handle errors gracefully', async () => {
       const errorMessage = 'Error fetching currencies';
-      (currenciesService.findAll as jest.Mock).mockRejectedValue(new Error(errorMessage));
+      (currenciesService.findAll as jest.Mock).mockRejectedValue(
+        new Error(errorMessage),
+      );
 
       await currenciesController.findAll(res);
 
@@ -70,7 +85,13 @@ describe('CurrenciesController', () => {
 
   describe('findOne', () => {
     it('should return a currency by ID on success', async () => {
-      const result = { id: 1, name: 'USD', created_at: new Date(), updated_at: new Date(), deleted_at: null };
+      const result = {
+        id: 1,
+        name: 'USD',
+        created_at: new Date(),
+        updated_at: new Date(),
+        deleted_at: null,
+      };
       const id = 1;
 
       (currenciesService.findOne as jest.Mock).mockResolvedValue(result);
@@ -89,7 +110,9 @@ describe('CurrenciesController', () => {
     it('should handle errors gracefully when fetching a currency by ID', async () => {
       const errorMessage = 'Error fetching currency';
       const id = 1;
-      (currenciesService.findOne as jest.Mock).mockRejectedValue(new Error(errorMessage));
+      (currenciesService.findOne as jest.Mock).mockRejectedValue(
+        new Error(errorMessage),
+      );
 
       await currenciesController.findOne(id, res);
 

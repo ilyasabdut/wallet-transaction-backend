@@ -7,7 +7,7 @@ import * as bcrypt from 'bcrypt';
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
   async signIn(
@@ -32,10 +32,10 @@ export class AuthService {
       });
     }
 
-    const payload = { 
-      sub: user.id, 
-      username: user.username, 
-      role: user.roles[0].role.name 
+    const payload = {
+      sub: user.id,
+      username: user.username,
+      role: user.roles[0].role.name,
     };
 
     return {

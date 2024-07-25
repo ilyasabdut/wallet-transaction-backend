@@ -21,7 +21,7 @@ const protectedAppGuard = {
       signOptions: { expiresIn: '24h' },
     }),
   ],
-  providers: [AuthService,protectedAppGuard],
+  providers: [AuthService, protectedAppGuard],
   controllers: [AuthController],
   exports: [AuthService],
 })

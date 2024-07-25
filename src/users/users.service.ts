@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -6,14 +6,12 @@ import { UserRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    private userRepo: UserRepository
-  ) {}
+  constructor(private userRepo: UserRepository) {}
 
- async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto) {
     const { username, password, role } = createUserDto;
 
-    const getUser = await this.userRepo.getUserByUsername(username)
+    const getUser = await this.userRepo.getUserByUsername(username);
 
     if (getUser) {
       throw new Error('User already exists');
@@ -21,12 +19,12 @@ export class UsersService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const getRole = await this.userRepo.getRoleByName(role)
+    const getRole = await this.userRepo.getRoleByName(role);
 
     if (!getRole) {
       throw new Error('Role not found');
     }
-    
+
     const user = await this.userRepo.createUser({
       username: username,
       password: hashedPassword,
@@ -42,7 +40,7 @@ export class UsersService {
   }
 
   async findOne(username: string, withPassword: boolean = false) {
-    const user = await this.userRepo.getUserByUsername(username, withPassword)
+    const user = await this.userRepo.getUserByUsername(username, withPassword);
 
     if (!user) {
       throw new Error('User not found');
@@ -53,7 +51,7 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     const { username, password, role } = updateUserDto;
-    const getUser = await this.findOne(username)
+    const getUser = await this.findOne(username);
 
     if (!getUser) {
       throw new Error('User not exists');
@@ -66,7 +64,7 @@ export class UsersService {
 
     let getRole;
     if (role) {
-      getRole = await this.userRepo.getRoleByName(role)
+      getRole = await this.userRepo.getRoleByName(role);
 
       if (!getRole) {
         throw new Error('Role not found');
@@ -79,10 +77,10 @@ export class UsersService {
       role: getRole?.id,
     });
 
-    return  user;
+    return user;
   }
 
-   remove(id: number) {
+  remove(id: number) {
     const user = this.userRepo.deleteUser(id);
 
     if (!user) {
@@ -90,6 +88,5 @@ export class UsersService {
     }
 
     return user;
-
   }
 }

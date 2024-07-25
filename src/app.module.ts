@@ -8,7 +8,13 @@ import { CurrenciesModule } from './masterdatas/currencies/currencies.module';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, TransactionsModule, CurrenciesModule, AuthModule],
+  imports: [
+    PrismaModule,
+    UsersModule,
+    TransactionsModule,
+    CurrenciesModule,
+    AuthModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -33,20 +33,20 @@ describe('CurrenciesService', () => {
   describe('findAll', () => {
     it('should return an array of currencies', async () => {
       const result = [
-        { 
-          id: 1, 
-          name: 'Bitcoin', 
-          created_at: new Date(), 
-          updated_at: new Date(), 
-          deleted_at: null 
+        {
+          id: 1,
+          name: 'Bitcoin',
+          created_at: new Date(),
+          updated_at: new Date(),
+          deleted_at: null,
         },
-        { 
-          id: 2, 
-          name: 'Ethereum', 
-          created_at: new Date(), 
-          updated_at: new Date(), 
-          deleted_at: null 
-        }
+        {
+          id: 2,
+          name: 'Ethereum',
+          created_at: new Date(),
+          updated_at: new Date(),
+          deleted_at: null,
+        },
       ];
       jest.spyOn(prisma.currency, 'findMany').mockResolvedValue(result);
 
@@ -56,12 +56,12 @@ describe('CurrenciesService', () => {
 
   describe('findOne', () => {
     it('should return a single currency by id', async () => {
-      const result = { 
-        id: 1, 
-        name: 'Bitcoin', 
-        created_at: new Date(), 
-        updated_at: new Date(), 
-        deleted_at: null 
+      const result = {
+        id: 1,
+        name: 'Bitcoin',
+        created_at: new Date(),
+        updated_at: new Date(),
+        deleted_at: null,
       };
       jest.spyOn(prisma.currency, 'findUnique').mockResolvedValue(result);
 

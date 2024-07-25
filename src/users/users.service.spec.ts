@@ -47,7 +47,9 @@ describe('UsersService', () => {
 
       const result = await usersService.create(createUserDto);
 
-      expect(userRepo.getUserByUsername).toHaveBeenCalledWith(createUserDto.username);
+      expect(userRepo.getUserByUsername).toHaveBeenCalledWith(
+        createUserDto.username,
+      );
       expect(userRepo.getRoleByName).toHaveBeenCalledWith(createUserDto.role);
       expect(userRepo.createUser).toHaveBeenCalledWith({
         username: createUserDto.username,
@@ -70,7 +72,9 @@ describe('UsersService', () => {
 
       (userRepo.getUserByUsername as jest.Mock).mockResolvedValue({ id: 1 }); // User exists
 
-      await expect(usersService.create(createUserDto)).rejects.toThrow('User already exists');
+      await expect(usersService.create(createUserDto)).rejects.toThrow(
+        'User already exists',
+      );
     });
 
     it('should throw an error if the role is not found', async () => {
@@ -83,7 +87,9 @@ describe('UsersService', () => {
       (userRepo.getUserByUsername as jest.Mock).mockResolvedValue(null); // No user exists
       (userRepo.getRoleByName as jest.Mock).mockResolvedValue(null); // Role does not exist
 
-      await expect(usersService.create(createUserDto)).rejects.toThrow('Role not found');
+      await expect(usersService.create(createUserDto)).rejects.toThrow(
+        'Role not found',
+      );
     });
   });
 });

@@ -6,7 +6,7 @@ import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 @ApiBearerAuth()
 @Controller('masterdata/currencies')
 export class CurrenciesController {
-  constructor(private readonly currenciesService: CurrenciesService) { }
+  constructor(private readonly currenciesService: CurrenciesService) {}
 
   @Get()
   @ApiOkResponse({ isArray: true })
@@ -28,7 +28,7 @@ export class CurrenciesController {
 
   @Get(':id')
   @ApiOkResponse({ isArray: true })
-  async findOne(@Param('id') id : number, @Res() res: Response) {
+  async findOne(@Param('id') id: number, @Res() res: Response) {
     try {
       const currency = await this.currenciesService.findOne(+id);
       return res.status(HttpStatus.OK).json({
@@ -43,5 +43,4 @@ export class CurrenciesController {
       });
     }
   }
-
 }
