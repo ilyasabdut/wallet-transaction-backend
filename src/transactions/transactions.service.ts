@@ -75,7 +75,7 @@ export class TransactionsService {
         currency_id: currency_id,
         amount: amount, // Credit amount is positive
         type: 'credit',
-        notes: notes,
+        notes: 'Transaction from received ' + getUserFrom.username + ' to ' + getUserTo.username,
         created_at: new Date(),
         updated_at: new Date(),
     });
@@ -183,9 +183,16 @@ export class TransactionsService {
     }  
   }
 
-  // findAll() {
-  //   return `This action returns all transactions`;
-  // }
+  async findAll(username: string, page: number, pageSize: number, search: string) {
+    try {
+      const transaction = await this.transactionRepo.findAll(username, page, pageSize, search);
+      
+      return transaction;
+    } catch (error) {
+      console.error('Error in getTopUsers:', error);
+      throw new Error('Error fetching top users');
+    }  
+  }
 
   // findOne(id: number) {
   //   return `This action returns a #${id} transaction`;

@@ -25,7 +25,6 @@ export class AuthController {
           data: access_token,
         });
       } catch (error) {
-        console.log(error);
         return res.status(HttpStatus.BAD_REQUEST).json({
           statusCode: HttpStatus.BAD_REQUEST,
           message: error.message,

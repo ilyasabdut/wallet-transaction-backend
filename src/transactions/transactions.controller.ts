@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, Query } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { TransactionEntity } from './entities/transaction.entity';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import {Response} from 'express';
+import { FindAllTransaction } from './dto/find-all-transaction.dto';
 
 @Controller('transactions')
 @ApiTags('Transactions')
@@ -24,7 +25,6 @@ export class TransactionsController {
         data: transaction,
       });
     } catch (error) {
-      console.log(error);
       return res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
@@ -51,9 +51,10 @@ export class TransactionsController {
   }
 
   //TODO update Entity
-  @Get('balance/:username')
+  @Get('balance')
+  @ApiQuery({ name: 'username' })
   @ApiOkResponse({ type: TransactionEntity, isArray: true })
-  async getBalance(@Param('username') username: string,@Res() res: Response) {
+  async getBalance(@Query('username') username: string,@Res() res: Response) {
     try {
       const balance = await this.transactionsService.getBalance(username);
       return res.status(HttpStatus.OK).json({
@@ -69,6 +70,33 @@ export class TransactionsController {
     }
   }
 
+  //TODO update Entity
+  @Get('list-transaction')
+  @ApiQuery({ name: 'username', required: false })
+  @ApiQuery({ name: 'page', required: true, example: 1 })
+  @ApiQuery({ name: 'pageSize', required: true, example: 10 })
+  @ApiQuery({ name: 'search', required: false })
+
+  @ApiOkResponse({ type: TransactionEntity, isArray: true })
+  async GetListTransaction(@Query() query: FindAllTransaction,@Res() res: Response) {
+    try {
+      const { username, page, pageSize, search } = query;
+
+      const transaction = await this.transactionsService.findAll(username, page, pageSize, search);
+      return res.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'List transaction found successfully',
+        data: transaction,
+      });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: error.message,
+      });
+    }
+  }
+  
+  
   //TODO update Entity
   @Get('top-users')
   @ApiOkResponse({ type: TransactionEntity, isArray: true })
@@ -89,9 +117,10 @@ export class TransactionsController {
   }
 
     //TODO update Entity
-    @Get('top-transactions/:username')
+    @Get('top-transactions')
+    @ApiQuery({ name: 'username' })
     @ApiOkResponse({ type: TransactionEntity, isArray: true })
-    async getTopTransactions(@Param('username') username: string, @Res() res: Response) {
+    async getTopTransactions(@Query('username') username: string, @Res() res: Response) {
       try {
         const topTransactions = await this.transactionsService.getTopTransactions(username);
         return res.status(HttpStatus.OK).json({

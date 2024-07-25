@@ -1,48 +1,48 @@
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { serializeBigInt } from  'src/helper/helper';
+import { serializeBigInt } from 'src/helper/helper';
 
 interface BalanceItem {
-  currency_name: string;
-  total_amount: number;
+    currency_name: string;
+    total_amount: number;
 }
 
 interface RankUsersItem {
-  rank: number;
-  username: string;
-  currency_name: string;
-  total_debit: number;
+    rank: number;
+    username: string;
+    currency_name: string;
+    total_debit: number;
 }
 
 @Injectable()
 export class TransactionRepository {
-  constructor(
-    private prisma: PrismaService,
-) {}
-    
-  async createTransaction(data: {
-    user_id:number,
-    from_user_id: number, 
-    to_user_id:number,
-    currency_id: number;
-    amount: number;
-    type: 'debit' | 'credit';
-    notes: string;
-    created_at?: Date;
-    updated_at?: Date;
-  }) {
-    return this.prisma.transaction.create({
-      data: {
-        ...data,
-        created_at: data.created_at || new Date(),
-        updated_at: data.updated_at || new Date(),
-      },
-    });
-  }
+    constructor(
+        private prisma: PrismaService,
+    ) { }
 
-  async getUserBalanceByUsername(username: string): Promise<BalanceItem[]> {
-    try {
-      const balance = await this.prisma.$queryRaw<BalanceItem[]>`
+    async createTransaction(data: {
+        user_id: number,
+        from_user_id: number,
+        to_user_id: number,
+        currency_id: number;
+        amount: number;
+        type: 'debit' | 'credit';
+        notes: string;
+        created_at?: Date;
+        updated_at?: Date;
+    }) {
+        return this.prisma.transaction.create({
+            data: {
+                ...data,
+                created_at: data.created_at || new Date(),
+                updated_at: data.updated_at || new Date(),
+            },
+        });
+    }
+
+    async getUserBalanceByUsername(username: string): Promise<BalanceItem[]> {
+        try {
+            const balance = await this.prisma.$queryRaw<BalanceItem[]>`
         SELECT
           usr.id,
           usr.username,
@@ -61,40 +61,40 @@ export class TransactionRepository {
           usr.username,
           cur.name;
       `;
-      return balance;
-    } catch (error) {
-      console.error('Error fetching user balance:', error);
-      throw error;
-    }
-  }
-
-  async isCurrencyMatch(username: string, expectedCurrencyName: string, amount: number): Promise<boolean> {
-    try {
-      const userBalance = await this.getUserBalanceByUsername(username);
-
-      if (Array.isArray(userBalance)) {
-        const matchedBalance = userBalance.find(balance => balance.currency_name === expectedCurrencyName);
-
-        if (matchedBalance) {
-          if (matchedBalance.total_amount - amount <= 0) {
-            throw new Error(`Balance is insufficient for ${expectedCurrencyName} for user ${username}`);
-          }
-          return true;
+            return balance;
+        } catch (error) {
+            console.error('Error fetching user balance:', error);
+            throw error;
         }
-
-        throw new Error(`Currency ${expectedCurrencyName} is not available for user ${username}`);
-      }
-
-      return false;
-    } catch (error) {
-      console.error('Error checking currency name:', error);
-      throw error;
     }
-  }
 
-  async queryTopUsers(currencyName: string): Promise<RankUsersItem[]> {
-    try {
-      const rawTopUsers = await this.prisma.$queryRaw<RankUsersItem[]>`
+    async isCurrencyMatch(username: string, expectedCurrencyName: string, amount: number): Promise<boolean> {
+        try {
+            const userBalance = await this.getUserBalanceByUsername(username);
+
+            if (Array.isArray(userBalance)) {
+                const matchedBalance = userBalance.find(balance => balance.currency_name === expectedCurrencyName);
+
+                if (matchedBalance) {
+                    if (matchedBalance.total_amount - amount <= 0) {
+                        throw new Error(`You do not have enough ${expectedCurrencyName}`);
+                    }
+                    return true;
+                }
+
+                throw new Error(`You do not have ${expectedCurrencyName}`);
+            }
+
+            return false;
+        } catch (error) {
+            console.error('Error checking currency name:', error);
+            throw error;
+        }
+    }
+
+    async queryTopUsers(currencyName: string): Promise<RankUsersItem[]> {
+        try {
+            const rawTopUsers = await this.prisma.$queryRaw<RankUsersItem[]>`
         SELECT
           ROW_NUMBER() OVER (
             ORDER BY ABS(SUM(
@@ -117,35 +117,35 @@ export class TransactionRepository {
           total_debit DESC
         LIMIT 10;
       `;
-      return serializeBigInt(rawTopUsers);
-    } catch (error) {
-      console.error('Error fetching top users:', error);
-      throw new Error('Error fetching top users');
-    }
-  }
-
-  async getTopTransaction(username: string, currencyName: string): Promise<{ debit: RankUsersItem; credit: RankUsersItem }> {
-    try {
-      const debitTransaction = await this.queryTopTransactionsDebit(username, currencyName);
-      const creditTransaction = await this.queryTopTransactionsCredit(username, currencyName);
-      // Check if both transactions are null or undefined
-        if (debitTransaction == null && creditTransaction == null) {
-            return null; // Return an empty object if both are null or undefined
+            return serializeBigInt(rawTopUsers);
+        } catch (error) {
+            console.error('Error fetching top users:', error);
+            throw new Error('Error fetching top users');
         }
-        
-      return {
-        debit: debitTransaction ?? null,
-        credit: creditTransaction ?? null,
-      };
-    } catch (error) {
-      console.error('Error fetching top transactions:', error);
-      throw new Error('Error fetching top transactions');
     }
-  }
 
-  async queryTopTransactionsDebit(username: string, currencyName: string): Promise<RankUsersItem> {
-    try {
-      const rawTopTransactionsDebit = await this.prisma.$queryRaw<RankUsersItem[]>`
+    async getTopTransaction(username: string, currencyName: string): Promise<{ debit: RankUsersItem; credit: RankUsersItem }> {
+        try {
+            const debitTransaction = await this.queryTopTransactionsDebit(username, currencyName);
+            const creditTransaction = await this.queryTopTransactionsCredit(username, currencyName);
+            // Check if both transactions are null or undefined
+            if (debitTransaction == null && creditTransaction == null) {
+                return null; // Return an empty object if both are null or undefined
+            }
+
+            return {
+                debit: debitTransaction ?? null,
+                credit: creditTransaction ?? null,
+            };
+        } catch (error) {
+            console.error('Error fetching top transactions:', error);
+            throw new Error('Error fetching top transactions');
+        }
+    }
+
+    async queryTopTransactionsDebit(username: string, currencyName: string): Promise<RankUsersItem> {
+        try {
+            const rawTopTransactionsDebit = await this.prisma.$queryRaw<RankUsersItem[]>`
         SELECT
           ROW_NUMBER() OVER (
             ORDER BY ABS(SUM(
@@ -171,17 +171,17 @@ export class TransactionRepository {
           total_debit ASC
         LIMIT 10;
       `;
-      const serializedTopUsers = serializeBigInt(rawTopTransactionsDebit);
-      return serializedTopUsers[0];
-    } catch (error) {
-      console.error('Error fetching Top Transactions Debit:', error);
-      throw new Error('Error fetching Top Transactions Debit');
+            const serializedTopUsers = serializeBigInt(rawTopTransactionsDebit);
+            return serializedTopUsers[0];
+        } catch (error) {
+            console.error('Error fetching Top Transactions Debit:', error);
+            throw new Error('Error fetching Top Transactions Debit');
+        }
     }
-  }
 
-  async queryTopTransactionsCredit(username: string, currencyName: string): Promise<RankUsersItem> {
-    try {
-      const rawTopTransactionsCredit = await this.prisma.$queryRaw<RankUsersItem[]>`
+    async queryTopTransactionsCredit(username: string, currencyName: string): Promise<RankUsersItem> {
+        try {
+            const rawTopTransactionsCredit = await this.prisma.$queryRaw<RankUsersItem[]>`
         SELECT
           ROW_NUMBER() OVER (
             ORDER BY ABS(SUM(
@@ -207,11 +207,72 @@ export class TransactionRepository {
           total_credit DESC
         LIMIT 10;
       `;
-      const serializedTopUsers = serializeBigInt(rawTopTransactionsCredit);
-      return serializedTopUsers[0];
-    } catch (error) {
-      console.error('Error fetching Top Transactions Credit:', error);
-      throw new Error('Error fetching Top Transactions Credit');
+            const serializedTopUsers = serializeBigInt(rawTopTransactionsCredit);
+            return serializedTopUsers[0];
+        } catch (error) {
+            console.error('Error fetching Top Transactions Credit:', error);
+            throw new Error('Error fetching Top Transactions Credit');
+        }
     }
-  }
+
+    async findAll(username: string, page: number, pageSize: number, search: string) {
+        try {
+            const getUser = await this.prisma.user.findUnique({
+                where: {
+                    username: username,
+                },
+            })
+
+            const skip = (page - 1) * pageSize;
+
+            const transactions = await this.prisma.transaction.findMany({
+                skip: skip,
+                take: Number(pageSize),
+                where: {
+                    user_id: getUser.id,
+                    ...(search && search.trim() && {
+                        OR: [
+                            { id: parseInt(search, 10) || -1 }, // Safeguard against NaN, will not match if search is not a number
+                            { currency: { name: { contains: search, mode: 'insensitive' } } },
+                            { type: { contains: search, mode: 'insensitive' } },
+                            { notes: { contains: search, mode: 'insensitive' } },
+                            { transactionFromUserId: { username: { contains: search, mode: 'insensitive' } } },
+                            { transactionToUserId: { username: { contains: search, mode: 'insensitive' } } },
+                        ],
+                    }),
+                },
+                include: {
+                    currency: true,
+                    transactionFromUserId: {
+                        select: {
+                            username: true,
+                        },
+                    },
+                    transactionToUserId: {
+                        select: {
+                            username: true,
+                        },
+                    },
+                },
+                orderBy: {
+                    created_at: 'desc',
+                },
+            });
+            
+            const transformedTransactions = transactions.map((tx) => ({
+                tx_id: tx.id,
+                currency_name: tx.currency.name,
+                type: tx.type,
+                amount: tx.amount,
+                from_username: tx.transactionFromUserId?.username || 'DEPOSIT',
+                to_username: tx.transactionToUserId.username,
+                notes: tx.notes,
+            }));
+
+            return transformedTransactions;
+        } catch (error) {
+            console.error('Error fetching transactions:', error);
+            throw new Error('Error fetching transactions');
+        }
+    }
 }

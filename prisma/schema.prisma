@@ -23,6 +23,9 @@ model User {
   deleted_at  DateTime?
   roles       UserRolePivot[]
   transaction Transaction[]
+
+  transactionFromUserId Transaction[] @relation("transactionFromUserId")
+  transactionToUserId   Transaction[] @relation("transactionToUserId")
 }
 
 model UserRolePivot {
@@ -59,7 +62,10 @@ model Transaction {
   updated_at   DateTime  @updatedAt
   deleted_at   DateTime?
 
-  user     User     @relation(fields: [user_id], references: [id])
+  user                  User  @relation(fields: [user_id], references: [id])
+  transactionFromUserId User? @relation("transactionFromUserId", fields: [from_user_id], references: [id])
+  transactionToUserId   User? @relation("transactionToUserId", fields: [to_user_id], references: [id])
+
   currency Currency @relation(fields: [currency_id], references: [id])
 }
 
