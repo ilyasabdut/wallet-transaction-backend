@@ -47,9 +47,9 @@ export class TransactionRepository {
           usr.id,
           usr.username,
           COALESCE(cur.name, 'EMPTY') AS currency_name,
-          SUM(CASE WHEN tx.type = 'credit' THEN tx.amount ELSE 0 END) AS total_credit,
-          SUM(CASE WHEN tx.type = 'debit' THEN tx.amount ELSE 0 END) AS total_debit,
-          COALESCE(SUM(tx.amount), 0) AS total_amount
+          ROUND(SUM(CASE WHEN tx.type = 'credit' THEN tx.amount ELSE 0 END)::numeric, 2) AS total_credit,
+          ROUND(SUM(CASE WHEN tx.type = 'debit' THEN tx.amount ELSE 0 END)::numeric, 2) AS total_debit,
+          ROUND(COALESCE(SUM(tx.amount), 0)::numeric, 2) AS total_amount
         FROM
           "User" AS usr
           LEFT JOIN "Transaction" AS tx ON tx.user_id = usr.id
@@ -103,9 +103,7 @@ export class TransactionRepository {
           ) AS rank,
           usr.username,
           COALESCE(cur.name, 'EMPTY') AS currency_name,
-          ABS(SUM(
-            CASE WHEN tx.type = 'debit' THEN tx.amount ELSE 0 END
-          )) AS total_debit
+          ABS(SUM(CASE WHEN tx.type = 'debit' THEN tx.amount ELSE 0 END)) AS total_debit
         FROM
           "User" AS usr
           LEFT JOIN "Transaction" AS tx ON tx.user_id = usr.id
@@ -130,9 +128,14 @@ export class TransactionRepository {
     try {
       const debitTransaction = await this.queryTopTransactionsDebit(username, currencyName);
       const creditTransaction = await this.queryTopTransactionsCredit(username, currencyName);
+      // Check if both transactions are null or undefined
+        if (debitTransaction == null && creditTransaction == null) {
+            return null; // Return an empty object if both are null or undefined
+        }
+        
       return {
-        debit: debitTransaction ,
-        credit: creditTransaction,
+        debit: debitTransaction ?? null,
+        credit: creditTransaction ?? null,
       };
     } catch (error) {
       console.error('Error fetching top transactions:', error);

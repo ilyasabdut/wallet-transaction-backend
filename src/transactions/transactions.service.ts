@@ -168,10 +168,12 @@ export class TransactionsService {
       let response = [];
       for (const curr of currency) {
         const topTransactions = await this.transactionRepo.getTopTransaction(username,curr.name);
-        response.push({
-          currency: curr.name,
-          top_transactions: topTransactions,
-        });
+        if(topTransactions){
+          response.push({
+            currency: curr.name,
+            top_transactions: topTransactions,
+          });
+        }
       }
       
       return response;
