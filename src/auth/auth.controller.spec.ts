@@ -35,6 +35,7 @@ describe('AuthController', () => {
 
       await authController.signIn(signInDto, res as Response);
 
+      
       expect(authService.signIn).toHaveBeenCalledWith(
         signInDto.username,
         signInDto.password,
