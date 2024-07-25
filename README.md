@@ -18,6 +18,20 @@ This project provides a backend for a simple crypto wallet application using Nes
 - PostgreSQL
 - Prisma CLI
 
+
+### Architecture
+
+The backend is built using NestJS, a popular Node.js framework. Prisma is used as an ORM to interact with the database. PostgreSQL is the chosen database for this project.
+
+### Database Schema
+created using dbdiagram.io
+![alt text](image.png)
+
+## Deployment
+
+Backend is deployed on Render.
+Database is deployed on Neon.
+
 ### Setup
 
 1. **Clone the Repository**
@@ -37,7 +51,7 @@ This project provides a backend for a simple crypto wallet application using Nes
 
    
    DATABASE_URL="postgresql://username:password@localhost:5432/yourdatabase"
-   
+   SECRET_KEY="yoursecretkey"
 
 4. **Run Prisma Migrations**
 
