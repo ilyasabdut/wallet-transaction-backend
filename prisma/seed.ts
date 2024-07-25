@@ -12,13 +12,13 @@ async function main() {
   // Create Roles
   const roleAdmin = await prisma.role.create({
     data: {
-      name: 'Admin',  // Using a string for the role name
+      name: 'Admin',
     },
   });
 
   const roleUser = await prisma.role.create({
     data: {
-      name: 'User',  // Using a string for the role name
+      name: 'User',
     },
   });
 
@@ -56,49 +56,36 @@ async function main() {
   });
 
   // Create Currency
-  const currencyUSD = await prisma.currency.create({
-    data: {
-      name: 'USD',
-    },
-  });
+  const currencies = [
+    'Bitcoin',
+    'Ethereum',
+  ];
 
-
-  const currencyBTC = await prisma.currency.create({
-    data: {
-      name: 'Bitcoin',
-    },
-  });
-
-  const currencyETH = await prisma.currency.create({
-    data: {
-      name: 'Ethereum',
-    },
-  });
+  const createdCurrencies = await Promise.all(currencies.map(name =>
+    prisma.currency.create({
+      data: { name },
+    })
+  ));
 
   // Create Transactions
-  await prisma.transaction.create({
-    data: {
-      user_id: user1.id,
-      currency_id: currencyBTC.id,
-      amount: 0.5,
-      type: 'Credit',
-      from_user_id: null,
-      to_user_id: user1.id,
-      notes: 'Deposit from external wallet to john_doe\'s wallet',
-    },
-  });
+  const transactions = [
+    { user_id: user1.id, currency_id: createdCurrencies[0].id, amount: 0.5, type: 'Credit', from_user_id: null, to_user_id: user1.id, notes: 'Deposit from external wallet to john_doe\'s wallet' },
+    { user_id: user2.id, currency_id: createdCurrencies[1].id, amount: -1.2, type: 'Debit', from_user_id: user2.id, to_user_id: user1.id, notes: 'Transfer from jane_doe to john_doe' },
+    { user_id: user1.id, currency_id: createdCurrencies[0].id, amount: 2.5, type: 'Credit', from_user_id: null, to_user_id: user1.id, notes: 'Deposit from external wallet to john_doe\'s wallet' },
+    { user_id: user2.id, currency_id: createdCurrencies[1].id, amount: -3.0, type: 'Debit', from_user_id: user2.id, to_user_id: user1.id, notes: 'Transfer from jane_doe to john_doe' },
+    { user_id: user1.id, currency_id: createdCurrencies[1].id, amount: 1.0, type: 'Credit', from_user_id: null, to_user_id: user1.id, notes: 'Deposit from external wallet to john_doe\'s wallet' },
+    { user_id: user2.id, currency_id: createdCurrencies[0].id, amount: -0.7, type: 'Debit', from_user_id: user2.id, to_user_id: user1.id, notes: 'Transfer from jane_doe to john_doe' },
+    { user_id: user1.id, currency_id: createdCurrencies[0].id, amount: 0.8, type: 'Credit', from_user_id: null, to_user_id: user1.id, notes: 'Deposit from external wallet to john_doe\'s wallet' },
+    { user_id: user2.id, currency_id: createdCurrencies[1].id, amount: -1.5, type: 'Debit', from_user_id: user2.id, to_user_id: user1.id, notes: 'Transfer from jane_doe to john_doe' },
+    { user_id: user1.id, currency_id: createdCurrencies[0].id, amount: 2.0, type: 'Credit', from_user_id: null, to_user_id: user1.id, notes: 'Deposit from external wallet to john_doe\'s wallet' },
+    { user_id: user2.id, currency_id: createdCurrencies[1].id, amount: -1.8, type: 'Debit', from_user_id: user2.id, to_user_id: user1.id, notes: 'Transfer from jane_doe to john_doe' },
+  ];
 
-  await prisma.transaction.create({
-    data: {
-      user_id: user2.id,
-      currency_id: currencyETH.id,
-      amount: -1.2,
-      type: 'Debit',
-      from_user_id: user2.id,
-      to_user_id: user1.id,
-      notes: 'Transfer from jane_doe to john_doe',
-    },
-  });
+  await Promise.all(transactions.map(transaction =>
+    prisma.transaction.create({
+      data: transaction,
+    })
+  ));
 }
 
 main()
