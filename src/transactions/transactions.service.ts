@@ -187,8 +187,8 @@ export class TransactionsService {
 
       return response;
     } catch (error) {
-      console.error('Error in getTopUsers:', error);
-      throw new Error('Error fetching top users');
+      console.error('Error in getTopTransactions:', error);
+      throw new Error('Error fetching top transactions');
     }
   }
 
@@ -208,20 +208,9 @@ export class TransactionsService {
 
       return transaction;
     } catch (error) {
-      console.error('Error in getTopUsers:', error);
-      throw new Error('Error fetching top users');
+      console.error('Error fetching all transactions:', error);
+      throw new Error('Error fetching all transactions');
     }
   }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} transaction`;
-  // }
-
-  // update(id: number, updateTransactionDto: UpdateTransactionDto) {
-  //   return `This action updates a #${id} transaction`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} transaction`;
-  // }
 }

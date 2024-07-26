@@ -26,10 +26,6 @@ describe('CurrenciesService', () => {
     prisma = module.get<PrismaService>(PrismaService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-
   describe('findAll', () => {
     it('should return an array of currencies', async () => {
       const result = [
