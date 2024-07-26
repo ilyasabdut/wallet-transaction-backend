@@ -26,7 +26,7 @@ export class UsersService {
     }
 
     const user = await this.userRepo.createUser({
-      username: username,
+      username: username.toLowerCase(),
       password: hashedPassword,
       role: getRole.id,
     });
