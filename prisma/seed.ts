@@ -69,7 +69,9 @@ async function main() {
 
   // Create Transactions
   const transactions = [
+    { user_id: user2.id, currency_id: createdCurrencies[1].id, amount: 10.5, type: 'credit', from_user_id: null, to_user_id: user2.id, notes: 'Deposit from external wallet to jane_doe\'s wallet' },
     { user_id: user1.id, currency_id: createdCurrencies[0].id, amount: 0.5, type: 'credit', from_user_id: null, to_user_id: user1.id, notes: 'Deposit from external wallet to john_doe\'s wallet' },
+    { user_id: user2.id, currency_id: createdCurrencies[1].id, amount: -1.2, type: 'debit', from_user_id: user2.id, to_user_id: user1.id, notes: 'Transfer from jane_doe to john_doe' },
     { user_id: user2.id, currency_id: createdCurrencies[1].id, amount: -1.2, type: 'debit', from_user_id: user2.id, to_user_id: user1.id, notes: 'Transfer from jane_doe to john_doe' },
     { user_id: user1.id, currency_id: createdCurrencies[0].id, amount: 2.5, type: 'credit', from_user_id: null, to_user_id: user1.id, notes: 'Deposit from external wallet to john_doe\'s wallet' },
     { user_id: user2.id, currency_id: createdCurrencies[1].id, amount: -3.0, type: 'debit', from_user_id: user2.id, to_user_id: user1.id, notes: 'Transfer from jane_doe to john_doe' },
