@@ -82,7 +82,7 @@ export class TransactionsService {
       amount: amount, // Credit amount is positive
       type: 'credit',
       notes:
-        'Transaction received from ' + getUserTo.username ,
+        'Transaction received from ' + getUserFrom.username ,
       created_at: new Date(),
       updated_at: new Date(),
     });
