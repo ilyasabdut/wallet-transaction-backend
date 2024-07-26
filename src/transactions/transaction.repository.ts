@@ -166,9 +166,9 @@ export class TransactionRepository {
       >`
         SELECT
           ROW_NUMBER() OVER (
-            ORDER BY ABS(SUM(
+            ORDER BY SUM(
               CASE WHEN tx.type = 'debit' THEN tx.amount ELSE 0 END
-            )) DESC
+            ) DESC
           ) AS rank,
           usr.username,
           cur.name AS currency_name,
@@ -207,9 +207,9 @@ export class TransactionRepository {
       >`
         SELECT
           ROW_NUMBER() OVER (
-            ORDER BY ABS(SUM(
+            ORDER BY SUM(
               CASE WHEN tx.type = 'credit' THEN tx.amount ELSE 0 END
-            )) DESC
+            ) DESC
           ) AS rank,
           usr.username,
           cur.name AS currency_name,

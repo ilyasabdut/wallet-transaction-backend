@@ -11,7 +11,6 @@ async function bootstrap() {
   });
 
   app.enableCors();
-  console.log(process.env.NODE_ENV)
   if (process.env.APP_ENV == 'local') {
     const config = new DocumentBuilder()
       .addBearerAuth()
