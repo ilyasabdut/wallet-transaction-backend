@@ -33,11 +33,35 @@ jobs:
     - name: Install dependencies
       run: npm install
 
+    - name: Build the application
+      run: npm run build
+
     - name: Run tests
       run: npm test -- --coverage
 
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts
+        path: |
+          dist/
+          node_modules/
+          package.json
+          package-lock.json
+
   deploy:
     runs-on: ubuntu-latest
+    env:
+      APP_ENV: ${{ vars.APP_ENV }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+      SENTRY_LOG_LEVEL: debug
+      SENTRY_URL: https://sentry.io/
+      deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
     needs: build-and-test
     if: github.ref == 'refs/heads/main'
 
@@ -50,31 +74,28 @@ jobs:
       with:
         node-version: '18'
 
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts
+        path: |
+          dist/
+          node_modules/
+          package.json
+          package-lock.json
+
     - name: Install dependencies
       run: npm install
 
-    - name: Build the application
-      run: npm run build
+    - name: Create Sentry release
+      uses: getsentry/action-release@v1
+      env:
+        SENTRY_AUTH_TOKEN: $SENTRY_AUTH_TOKEN
+        SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+        SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+      with:
+        environment: production
 
     - name: Deploy to server
-      env:
-        APP_ENV: ${{ secrets.APP_ENV }}
-        DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-        SENTRY_LOG_LEVEL: debug
-        deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
-
       run: |
-        # Create a new Sentry release
-        sentry-cli releases new "github-actions-${{ github.sha }}"
-        
-        # Set commits for the Sentry release
-        sentry-cli releases set-commits --auto "github-actions-${{ github.sha }}"
-        
-        # Finalize the Sentry release (Optional: Depending on your release process)
-        # sentry-cli releases finalize "github-actions-${{ github.sha }}"
-
-        # Trigger the deployment
         curl "$deploy_url"
