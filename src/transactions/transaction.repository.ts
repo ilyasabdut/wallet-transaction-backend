@@ -29,7 +29,7 @@ export class TransactionRepository {
     created_at?: Date;
     updated_at?: Date;
   }) {
-    return this.prisma.transaction.create({
+    return await this.prisma.transaction.create({
       data: {
         ...data,
         created_at: data.created_at || new Date(),
