@@ -6,7 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build && npm run sentry:sourcemaps && npm run sentry:sourcemaps",
+    "build": "nest build && npm run sentry:sourcemaps",
+    "build:prod": "nest build",
     "seed": "ts-node prisma/seed.ts",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",

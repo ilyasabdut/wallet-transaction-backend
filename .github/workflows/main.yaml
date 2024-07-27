@@ -3,12 +3,6 @@ env:  # Define environment variables for the deploy job
   APP_ENV: ${{ vars.APP_ENV }}
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
   SECRET_KEY: ${{ secrets.SECRET_KEY }}
-  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-  SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-  SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-  SENTRY_LOG_LEVEL: debug
-  SENTRY_URL: https://sentry.io/
   deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
 
 on:
@@ -50,16 +44,6 @@ jobs:
     - name: Run tests
       run: npm test -- --coverage
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: build-artifacts
-        path: |
-          dist/
-          node_modules/
-          package.json
-          package-lock.json
-
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-test
@@ -74,21 +58,6 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '18'
-
-    - name: Download build artifacts
-      uses: actions/download-artifact@v3
-      with:
-        name: build-artifacts
-        path: .
-
-    - name: Create Sentry release
-      uses: getsentry/action-release@v1
-      with:
-        environment: production
-      env:
-        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-        SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-        SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
 
     - name: Deploy to server
       run: |
