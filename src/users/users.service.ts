@@ -43,7 +43,9 @@ export class UsersService {
     const user = await this.userRepo.getUserByUsername(username, withPassword);
 
     if (!user) {
-      throw new Error('User not found');
+      const error = new Error('User not found');
+      console.log(error);
+      throw error;      
     }
 
     return user;
@@ -80,8 +82,8 @@ export class UsersService {
     return user;
   }
 
-  remove(id: number) {
-    const user = this.userRepo.deleteUser(id);
+  async remove(id: number) {
+    const user = await this.userRepo.deleteUser(id);
 
     if (!user) {
       throw new Error('User not found');

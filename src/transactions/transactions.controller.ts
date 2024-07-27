@@ -19,12 +19,13 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { FindAllTransaction } from './dto/find-all-transaction.dto';
+import * as Sentry from '@sentry/node';
 
 @Controller('transactions')
 @ApiTags('Transactions')
 @ApiBearerAuth()
 export class TransactionsController {
-  constructor(private readonly transactionsService: TransactionsService) {}
+  constructor(private readonly transactionsService: TransactionsService) { }
 
   @Post('transfer')
   @ApiCreatedResponse({ type: TransactionEntity })
@@ -41,6 +42,7 @@ export class TransactionsController {
         data: transaction,
       });
     } catch (error) {
+      Sentry.captureException(error);
       return res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
@@ -63,6 +65,7 @@ export class TransactionsController {
         data: transaction,
       });
     } catch (error) {
+      Sentry.captureException(error);
       return res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
@@ -83,6 +86,8 @@ export class TransactionsController {
         data: balance,
       });
     } catch (error) {
+      Sentry.captureException(error);
+
       return res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
@@ -116,6 +121,8 @@ export class TransactionsController {
         data: transaction,
       });
     } catch (error) {
+      Sentry.captureException(error);
+
       return res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
@@ -135,6 +142,8 @@ export class TransactionsController {
         data: topUsers,
       });
     } catch (error) {
+      Sentry.captureException(error);
+
       return res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
@@ -159,6 +168,8 @@ export class TransactionsController {
         data: topTransactions,
       });
     } catch (error) {
+      Sentry.captureException(error);
+
       return res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,

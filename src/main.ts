@@ -1,12 +1,25 @@
-import { BaseExceptionFilter, HttpAdapterHost, NestFactory } from '@nestjs/core';
+import * as Sentry from "@sentry/nestjs"
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { RequestMethod } from '@nestjs/common';
 import { SentryFilter } from "./sentry.filter";
-import * as Sentry from "@sentry/nestjs"
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
 
 async function bootstrap() {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: "production",
+    integrations: [
+      nodeProfilingIntegration(),
+      Sentry.prismaIntegration(),
+      Sentry.httpIntegration(),
+    ],
+    tracesSampleRate: 1.0,
+  
+    profilesSampleRate: 1.0,
+  });
+
   const app = await NestFactory.create(AppModule);
   const { httpAdapter } = app.get(HttpAdapterHost);
 
@@ -15,18 +28,8 @@ async function bootstrap() {
   });
 
   app.enableCors();
-
-  Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    environment: "production",
-    integrations: [
-      nodeProfilingIntegration(),
-    ],
-    tracesSampleRate: 1.0,
   
-    profilesSampleRate: 1.0,
-  });
-  
+  Sentry.setupNestErrorHandler(app, new SentryFilter(httpAdapter));
   app.useGlobalFilters(new SentryFilter(httpAdapter));
   
   if (process.env.APP_ENV == 'local') {

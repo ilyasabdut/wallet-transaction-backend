@@ -1,8 +1,8 @@
+import * as Sentry from '@sentry/node';
 import { Controller, Get, Res, HttpStatus, Param } from '@nestjs/common';
 import { CurrenciesService } from './currencies.service';
 import { Response } from 'express';
 import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
-
 @ApiBearerAuth()
 @Controller('masterdata/currencies')
 export class CurrenciesController {
@@ -19,6 +19,8 @@ export class CurrenciesController {
         data: currency,
       });
     } catch (error) {
+      Sentry.captureException(error);
+
       return res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
@@ -37,6 +39,8 @@ export class CurrenciesController {
         data: currency,
       });
     } catch (error) {
+      Sentry.captureException(error);
+
       return res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,

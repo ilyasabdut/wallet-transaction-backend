@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
   getHello(): string {
-    // throw new Error('Ops, theres a problem!');
+    // throw new BadRequestException('400!');
     return 'Hello World!, Welcome to Wallet Tranction API';
   }
 }
+ 

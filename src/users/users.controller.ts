@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node';
 import {
   Controller,
   Get,
@@ -41,6 +42,7 @@ export class UsersController {
         data: user,
       });
     } catch (error) {
+      Sentry.captureException(error);
       return res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
@@ -51,12 +53,20 @@ export class UsersController {
   @Get()
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findAll(@Res() res: Response) {
-    const users = await this.usersService.findAll();
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      message: 'Users found successfully',
-      data: users,
-    });
+    try{
+      const users = await this.usersService.findAll();
+      return res.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Users found successfully',
+        data: users,
+      });  
+    }catch (error) {
+      Sentry.captureException(error);
+      res.status(HttpStatus.BAD_REQUEST).json({
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: error.message,
+      });
+    }
   }
 
   @Get(':username')
@@ -70,6 +80,7 @@ export class UsersController {
         data: user,
       });
     } catch (error) {
+      Sentry.captureException(error);
       res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
@@ -92,6 +103,7 @@ export class UsersController {
         data: user,
       });
     } catch (error) {
+      Sentry.captureException(error);
       res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
@@ -110,6 +122,7 @@ export class UsersController {
         data: user,
       });
     } catch (error) {
+      Sentry.captureException(error);
       res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
