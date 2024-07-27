@@ -21,7 +21,7 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
     environment: render
 
@@ -48,44 +48,31 @@ jobs:
     - name: Build the application
       run: npm run build
 
-    - name: Archive build artifacts
-      run: |
-        mkdir -p build-artifacts
-        cp -R dist/ node_modules/ package.json package-lock.json build-artifacts/
-        tar -czvf build-artifacts.tar.gz build-artifacts
+    - name: Run tests
+      run: npm test -- --coverage
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
         name: build-artifacts
-        path: build-artifacts.tar.gz
-
-  test:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-    - name: Download build artifacts
-      uses: actions/download-artifact@v3
-      with:
-        name: build-artifacts
-        path: .
-
-    - name: Extract build artifacts
-      run: tar -xzvf build-artifacts.tar.gz
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Run tests
-      run: npm test -- --coverage
+        path: |
+          dist/
+          node_modules/
+          package.json
+          package-lock.json
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-and-test
     if: github.ref == 'refs/heads/main'
 
     steps:
+    - name: Print Auth Token1
+      run: echo $SENTRY_AUTH_TOKEN
+
+    - name: Print Auth Token2
+      run: echo ${{ secrets.SENTRY_AUTH_TOKEN }}
+
     - name: Checkout code
       uses: actions/checkout@v3
 
@@ -100,18 +87,8 @@ jobs:
         name: build-artifacts
         path: .
 
-    - name: Extract build artifacts
-      run: tar -xzvf build-artifacts.tar.gz
-
-    - name: Install dependencies
-      run: npm install
-
     - name: Create Sentry release
       uses: getsentry/action-release@v1
-      env:
-        SENTRY_AUTH_TOKEN: $SENTRY_AUTH_TOKEN
-        SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-        SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
       with:
         environment: production
 
