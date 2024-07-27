@@ -58,13 +58,23 @@ jobs:
 
     - name: Deploy to server
       env:
-        APP_ENV: ${{ vars.APP_ENV }}
+        APP_ENV: ${{ secrets.APP_ENV }}
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
         SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        SENTRY_LOG_LEVEL: debug
         deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+
       run: |
-        sentry-cli releases --auth-token $SENTRY_AUTH_TOKEN new "github-actions"
-        sentry-cli releases --auth-token $SENTRY_AUTH_TOKEN set-commits --auto "github-actions"
+        # Create a new Sentry release
+        sentry-cli releases new "github-actions-${{ github.sha }}"
+        
+        # Set commits for the Sentry release
+        sentry-cli releases set-commits --auto "github-actions-${{ github.sha }}"
+        
+        # Finalize the Sentry release (Optional: Depending on your release process)
+        # sentry-cli releases finalize "github-actions-${{ github.sha }}"
+
+        # Trigger the deployment
         curl "$deploy_url"
