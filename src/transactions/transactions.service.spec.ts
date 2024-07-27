@@ -37,6 +37,7 @@ describe('TransactionsService', () => {
             getUserBalanceByUsername: jest.fn(),
             getTopTransaction: jest.fn(),
             queryTopUsers: jest.fn(),
+            getTransactionCurrencies: jest.fn,
           },
         },
       ],
@@ -129,8 +130,7 @@ describe('TransactionsService', () => {
       const mockCurrencies = [{ name: 'Bitcoin' }, { name: 'Ethereum' }];
       const mockTopUsersBitcoin = [{ id: 1, username: 'user1' }];
       const mockTopUsersEthereum = [{ id: 2, username: 'user2' }];
-
-      (currencyService.findAll as jest.Mock).mockResolvedValue(mockCurrencies);
+      jest.spyOn(service, 'transactionCurrencies').mockResolvedValue(mockCurrencies);
       (transactionRepo.queryTopUsers as jest.Mock)
         .mockResolvedValueOnce(mockTopUsersBitcoin)
         .mockResolvedValueOnce(mockTopUsersEthereum);
@@ -141,7 +141,7 @@ describe('TransactionsService', () => {
         { currency: 'Bitcoin', top_users: mockTopUsersBitcoin },
         { currency: 'Ethereum', top_users: mockTopUsersEthereum },
       ]);
-      expect(currencyService.findAll).toHaveBeenCalled();
+      expect(service.transactionCurrencies).toHaveBeenCalled();
       expect(transactionRepo.queryTopUsers).toHaveBeenCalledTimes(2);
     });
 
@@ -154,7 +154,7 @@ describe('TransactionsService', () => {
       const mockTopTransactionsBitcoin = [{ id: 1, amount: 100 }];
       const mockTopTransactionsEthereum = [{ id: 2, amount: 200 }];
 
-      (currencyService.findAll as jest.Mock).mockResolvedValue(mockCurrencies);
+      jest.spyOn(service, 'transactionCurrencies').mockResolvedValue(mockCurrencies);
       (transactionRepo.getTopTransaction as jest.Mock)
         .mockResolvedValueOnce(mockTopTransactionsBitcoin)
         .mockResolvedValueOnce(mockTopTransactionsEthereum);
@@ -165,7 +165,7 @@ describe('TransactionsService', () => {
         { currency: 'Bitcoin', top_transactions: mockTopTransactionsBitcoin },
         { currency: 'Ethereum', top_transactions: mockTopTransactionsEthereum },
       ]);
-      expect(currencyService.findAll).toHaveBeenCalled();
+      expect(service.transactionCurrencies).toHaveBeenCalled();
       expect(transactionRepo.getTopTransaction).toHaveBeenCalledTimes(2);
       expect(transactionRepo.getTopTransaction).toHaveBeenCalledWith(username, 'Bitcoin');
       expect(transactionRepo.getTopTransaction).toHaveBeenCalledWith(username, 'Ethereum');

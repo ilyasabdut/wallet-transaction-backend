@@ -151,11 +151,13 @@ export class TransactionsService {
   async getTopUsers() {
     try {
       const currency = await this.transactionCurrencies();
+
       const response = [];
       for (const curr of currency) {
-        const topUsers = await this.transactionRepo.queryTopUsers(curr.currency_name);
+        // console.log(curr);
+        const topUsers = await this.transactionRepo.queryTopUsers(curr.name);
         response.push({
-          currency: curr.currency_name,
+          currency: curr.name,
           top_users: topUsers,
         });
       }
@@ -170,21 +172,20 @@ export class TransactionsService {
   async getTopTransactions(username: string) {
     try {
       const currency = await this.transactionCurrencies(username);
-
       const response = [];
       for (const curr of currency) {
         const topTransactions = await this.transactionRepo.getTopTransaction(
           username,
-          curr.currency_name,
+          curr.name,
         );
         if (topTransactions) {
           response.push({
-            currency: curr.currency_name,
+            currency: curr.name,
             top_transactions: topTransactions,
           });
         }
       }
-
+      console.log(response)
       return response;
     } catch (error) {
       console.error('Error in getTopTransactions:', error);

@@ -330,7 +330,6 @@ export class TransactionRepository {
     });
   
     return transactions.map(transaction => ({
-      currency_id: transaction.currency_id,
-      currency_name: transaction.currency.name
+      name: transaction.currency.name
     }));
   }}
