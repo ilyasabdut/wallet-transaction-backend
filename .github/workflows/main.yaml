@@ -1,4 +1,15 @@
 name: CI/CD Pipeline
+env:  # Define environment variables for the deploy job
+  APP_ENV: ${{ vars.APP_ENV }}
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  SECRET_KEY: ${{ secrets.SECRET_KEY }}
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+  SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+  SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+  SENTRY_LOG_LEVEL: debug
+  SENTRY_URL: https://sentry.io/
+  deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
 
 on:
   push:
@@ -54,18 +65,6 @@ jobs:
     needs: build-and-test
     if: github.ref == 'refs/heads/main'
     environment: render  # Specify environment if needed for deployment protection, etc.
-
-    env:  # Define environment variables for the deploy job
-      APP_ENV: ${{ vars.APP_ENV }}
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-      SENTRY_LOG_LEVEL: debug
-      SENTRY_URL: https://sentry.io/
-      deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
 
     steps:
     - name: Checkout code
