@@ -1,6 +1,6 @@
-# Crypto Wallet Application Backend
+# Wallet Transaction Backend
 
-This project provides a backend for a simple crypto wallet application using NestJS, Prisma, and PostgreSQL. It includes functionalities for user management, transactions, and more.
+This project provides a backend for a simple wallet application using NestJS, Prisma, and PostgreSQL. It includes functionalities for user management, transactions, and more.
 
 ## Features
 
@@ -50,8 +50,8 @@ Unit Test using Jest
 1. **Clone the Repository**
 
    
-   git clone https://github.com/yourusername/crypto-wallet-backend.git
-   cd crypto-wallet-backend
+   git clone https://github.com/yourusername/wallet-transaction-backend.git
+   cd wallet-transaction-backend
    
 
 2. **Install Dependencies**
