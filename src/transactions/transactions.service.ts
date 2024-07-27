@@ -150,12 +150,12 @@ export class TransactionsService {
 
   async getTopUsers() {
     try {
-      const currency = await this.currencyService.findAll();
+      const currency = await this.transactionCurrencies();
       const response = [];
       for (const curr of currency) {
-        const topUsers = await this.transactionRepo.queryTopUsers(curr.name);
+        const topUsers = await this.transactionRepo.queryTopUsers(curr.currency_name);
         response.push({
-          currency: curr.name,
+          currency: curr.currency_name,
           top_users: topUsers,
         });
       }
@@ -169,17 +169,17 @@ export class TransactionsService {
 
   async getTopTransactions(username: string) {
     try {
-      const currency = await this.currencyService.findAll();
+      const currency = await this.transactionCurrencies(username);
 
       const response = [];
       for (const curr of currency) {
         const topTransactions = await this.transactionRepo.getTopTransaction(
           username,
-          curr.name,
+          curr.currency_name,
         );
         if (topTransactions) {
           response.push({
-            currency: curr.name,
+            currency: curr.currency_name,
             top_transactions: topTransactions,
           });
         }
@@ -210,6 +210,21 @@ export class TransactionsService {
     } catch (error) {
       console.error('Error fetching all transactions:', error);
       throw new Error('Error fetching all transactions');
+    }
+  }
+
+  async transactionCurrencies(username=null){
+    try {
+      let getUserId:number = null;
+      if(username){
+        const getUser = await this.userService.findOne(username)
+        getUserId = getUser.id
+      }
+      const currencies = await this.transactionRepo.getTransactionCurrencies(getUserId)
+
+      return currencies
+    } catch (error) {
+      
     }
   }
 

@@ -314,4 +314,23 @@ export class TransactionRepository {
       throw new Error('Error fetching transactions');
     }
   }
-}
+
+  async getTransactionCurrencies(userId: number | null = null) {
+    const transactions = await this.prisma.transaction.findMany({
+      distinct: ['currency_id'],
+      where: userId ? { user_id: userId } : {},
+      include: {
+        currency: {
+          select: {
+            id: true,        
+            name: true
+          }
+        }
+      }
+    });
+  
+    return transactions.map(transaction => ({
+      currency_id: transaction.currency_id,
+      currency_name: transaction.currency.name
+    }));
+  }}
