@@ -66,6 +66,12 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
+    - name: Print Auth Token1
+      run: echo $SENTRY_AUTH_TOKEN
+
+    - name: Print Auth Token2
+      run: echo ${{ secrets.SENTRY_AUTH_TOKEN }}
+
     - name: Checkout code
       uses: actions/checkout@v3
 
