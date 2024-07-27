@@ -27,10 +27,20 @@ The backend is built using NestJS, a popular Node.js framework. Prisma is used a
 created using dbdiagram.io
 ![alt text](image.png)
 
-## Deployment
+### Logger
+Using sentry.io as logger. Needs to setup these env variables for deployment
+SENTRY_DSN: 
+SENTRY_AUTH_TOKEN: 
+SENTRY_ORG: 
+SENTRY_PROJECT: 
 
-Backend is deployed on Render.
-Database is deployed on Neon.
+### Deployment
+
+-Backend is deployed on Render.
+-Database is deployed on Neon.
+
+
+This repo uses Github Action as CI/CD. main.yaml could be found in .github/workflows/main.yaml
 
 ### Setup
 

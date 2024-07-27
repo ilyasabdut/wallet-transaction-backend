@@ -154,7 +154,6 @@ export class TransactionsService {
 
       const response = [];
       for (const curr of currency) {
-        // console.log(curr);
         const topUsers = await this.transactionRepo.queryTopUsers(curr.name);
         response.push({
           currency: curr.name,
@@ -185,7 +184,6 @@ export class TransactionsService {
           });
         }
       }
-      console.log(response)
       return response;
     } catch (error) {
       console.error('Error in getTopTransactions:', error);

@@ -8,6 +8,7 @@ import { nodeProfilingIntegration } from "@sentry/profiling-node";
 
 async function bootstrap() {
   Sentry.init({
+    release: "v1",
     dsn: process.env.SENTRY_DSN,
     environment: "production",
     integrations: [

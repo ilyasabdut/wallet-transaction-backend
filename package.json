@@ -19,7 +19,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org ilyasabdut-hobby-project --project wallet-transaction ./dist && sentry-cli sourcemaps upload --org ilyasabdut-hobby-project --project wallet-transaction ./dist"
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org ilyasabdut-hobby-project --project wallet-transaction ./dist && sentry-cli sourcemaps upload --org ilyasabdut-hobby-project --project wallet-transaction --release=v1 ./dist"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
