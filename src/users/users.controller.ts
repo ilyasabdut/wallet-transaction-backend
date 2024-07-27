@@ -53,14 +53,14 @@ export class UsersController {
   @Get()
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findAll(@Res() res: Response) {
-    try{
+    try {
       const users = await this.usersService.findAll();
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'Users found successfully',
         data: users,
-      });  
-    }catch (error) {
+      });
+    } catch (error) {
       Sentry.captureException(error);
       res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,

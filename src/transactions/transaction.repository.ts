@@ -322,14 +322,15 @@ export class TransactionRepository {
       include: {
         currency: {
           select: {
-            id: true,        
-            name: true
-          }
-        }
-      }
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
-  
-    return transactions.map(transaction => ({
-      name: transaction.currency.name
+
+    return transactions.map((transaction) => ({
+      name: transaction.currency.name,
     }));
-  }}
+  }
+}

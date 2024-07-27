@@ -101,7 +101,7 @@ describe('TransactionsController', () => {
         amount: 100,
         type: 'credit',
         notes: 'Test topup',
-        username_from: ''
+        username_from: '',
       };
 
       const mockTransaction = { id: 1, ...createTransactionDto };
@@ -130,7 +130,7 @@ describe('TransactionsController', () => {
         amount: 100,
         type: 'credit',
         notes: 'Test topup',
-        username_from: ''
+        username_from: '',
       };
 
       (service.topup as jest.Mock).mockRejectedValue(new Error('Error'));
@@ -195,7 +195,12 @@ describe('TransactionsController', () => {
 
   describe('GetListTransaction', () => {
     it('should get list of transactions and return response', async () => {
-      const query: FindAllTransaction = { username: 'user1', page: 1, pageSize: 10, search: '' };
+      const query: FindAllTransaction = {
+        username: 'user1',
+        page: 1,
+        pageSize: 10,
+        search: '',
+      };
       const mockTransactions = [{ id: 1, amount: 100 }];
       (service.findAll as jest.Mock).mockResolvedValue(mockTransactions);
 
@@ -206,7 +211,12 @@ describe('TransactionsController', () => {
 
       await controller.GetListTransaction(query, res as any);
 
-      expect(service.findAll).toHaveBeenCalledWith(query.username, query.page, query.pageSize, query.search);
+      expect(service.findAll).toHaveBeenCalledWith(
+        query.username,
+        query.page,
+        query.pageSize,
+        query.search,
+      );
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.json).toHaveBeenCalledWith({
         statusCode: HttpStatus.OK,
@@ -216,7 +226,12 @@ describe('TransactionsController', () => {
     });
 
     it('should handle error and return BAD_REQUEST status', async () => {
-      const query: FindAllTransaction = { username: 'user1', page: 1, pageSize: 10, search: '' };
+      const query: FindAllTransaction = {
+        username: 'user1',
+        page: 1,
+        pageSize: 10,
+        search: '',
+      };
       (service.findAll as jest.Mock).mockRejectedValue(new Error('Error'));
 
       const res = {
@@ -226,7 +241,12 @@ describe('TransactionsController', () => {
 
       await controller.GetListTransaction(query, res as any);
 
-      expect(service.findAll).toHaveBeenCalledWith(query.username, query.page, query.pageSize, query.search);
+      expect(service.findAll).toHaveBeenCalledWith(
+        query.username,
+        query.page,
+        query.pageSize,
+        query.search,
+      );
       expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
       expect(res.json).toHaveBeenCalledWith({
         statusCode: HttpStatus.BAD_REQUEST,
@@ -279,7 +299,9 @@ describe('TransactionsController', () => {
     it('should get top transactions and return response', async () => {
       const username = 'user1';
       const mockTopTransactions = [{ id: 1, amount: 100 }];
-      (service.getTopTransactions as jest.Mock).mockResolvedValue(mockTopTransactions);
+      (service.getTopTransactions as jest.Mock).mockResolvedValue(
+        mockTopTransactions,
+      );
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
@@ -298,7 +320,9 @@ describe('TransactionsController', () => {
 
     it('should handle error and return BAD_REQUEST status', async () => {
       const username = 'user1';
-      (service.getTopTransactions as jest.Mock).mockRejectedValue(new Error('Error'));
+      (service.getTopTransactions as jest.Mock).mockRejectedValue(
+        new Error('Error'),
+      );
 
       const res = {
         status: jest.fn().mockReturnThis(),

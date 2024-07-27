@@ -81,8 +81,7 @@ export class TransactionsService {
       currency_id: currency_id,
       amount: amount, // Credit amount is positive
       type: 'credit',
-      notes:
-        'Transaction received from ' + getUserFrom.username ,
+      notes: 'Transaction received from ' + getUserFrom.username,
       created_at: new Date(),
       updated_at: new Date(),
     });
@@ -212,19 +211,17 @@ export class TransactionsService {
     }
   }
 
-  async transactionCurrencies(username=null){
+  async transactionCurrencies(username = null) {
     try {
-      let getUserId:number = null;
-      if(username){
-        const getUser = await this.userService.findOne(username)
-        getUserId = getUser.id
+      let getUserId: number = null;
+      if (username) {
+        const getUser = await this.userService.findOne(username);
+        getUserId = getUser.id;
       }
-      const currencies = await this.transactionRepo.getTransactionCurrencies(getUserId)
+      const currencies =
+        await this.transactionRepo.getTransactionCurrencies(getUserId);
 
-      return currencies
-    } catch (error) {
-      
-    }
+      return currencies;
+    } catch (error) {}
   }
-
 }

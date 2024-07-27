@@ -8,7 +8,7 @@ import { Response } from 'express';
 describe('UsersController', () => {
   let controller: UsersController;
   let service: UsersService;
-  
+
   // Mock response function
   const mockResponse = () => {
     const res: Partial<Response> = {};
@@ -87,7 +87,6 @@ describe('UsersController', () => {
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
       });
-
     });
   });
 });

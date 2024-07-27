@@ -67,18 +67,30 @@ describe('TransactionsService', () => {
       const mockCreditTransaction = { id: 2 };
 
       (currencyService.findOne as jest.Mock).mockResolvedValue(mockCurrency);
-      (userService.findOne as jest.Mock).mockResolvedValueOnce(mockUserFrom).mockResolvedValueOnce(mockUserTo);
-      (transactionRepo.createTransaction as jest.Mock).mockResolvedValueOnce(mockDebitTransaction).mockResolvedValueOnce(mockCreditTransaction);
+      (userService.findOne as jest.Mock)
+        .mockResolvedValueOnce(mockUserFrom)
+        .mockResolvedValueOnce(mockUserTo);
+      (transactionRepo.createTransaction as jest.Mock)
+        .mockResolvedValueOnce(mockDebitTransaction)
+        .mockResolvedValueOnce(mockCreditTransaction);
 
       const result = await service.create(createTransactionDto);
 
-      expect(result).toEqual({ debitTransaction: mockDebitTransaction, creditTransaction: mockCreditTransaction });
-      expect(currencyService.findOne).toHaveBeenCalledWith(createTransactionDto.currency_id);
-      expect(userService.findOne).toHaveBeenCalledWith(createTransactionDto.username_from);
-      expect(userService.findOne).toHaveBeenCalledWith(createTransactionDto.username_to);
+      expect(result).toEqual({
+        debitTransaction: mockDebitTransaction,
+        creditTransaction: mockCreditTransaction,
+      });
+      expect(currencyService.findOne).toHaveBeenCalledWith(
+        createTransactionDto.currency_id,
+      );
+      expect(userService.findOne).toHaveBeenCalledWith(
+        createTransactionDto.username_from,
+      );
+      expect(userService.findOne).toHaveBeenCalledWith(
+        createTransactionDto.username_to,
+      );
       expect(transactionRepo.createTransaction).toHaveBeenCalledTimes(2);
     });
-
   });
 
   describe('topup', () => {
@@ -89,22 +101,25 @@ describe('TransactionsService', () => {
         amount: 100,
         type: 'credit',
         notes: 'Test topup',
-        username_from: ''
+        username_from: '',
       };
 
       const mockUser = { id: 1, username: 'user2' };
       const mockTopupTransaction = { id: 1 };
 
       (userService.findOne as jest.Mock).mockResolvedValue(mockUser);
-      (transactionRepo.createTransaction as jest.Mock).mockResolvedValue(mockTopupTransaction);
+      (transactionRepo.createTransaction as jest.Mock).mockResolvedValue(
+        mockTopupTransaction,
+      );
 
       const result = await service.topup(createTransactionDto);
 
       expect(result).toEqual(mockTopupTransaction);
-      expect(userService.findOne).toHaveBeenCalledWith(createTransactionDto.username_to);
+      expect(userService.findOne).toHaveBeenCalledWith(
+        createTransactionDto.username_to,
+      );
       expect(transactionRepo.createTransaction).toHaveBeenCalled();
     });
-
   });
 
   describe('getBalance', () => {
@@ -114,15 +129,18 @@ describe('TransactionsService', () => {
       const mockBalance = [{ currency_name: 'Bitcoin', total_amount: 100 }];
 
       (userService.findOne as jest.Mock).mockResolvedValue(mockUser);
-      (transactionRepo.getUserBalanceByUsername as jest.Mock).mockResolvedValue(mockBalance);
+      (transactionRepo.getUserBalanceByUsername as jest.Mock).mockResolvedValue(
+        mockBalance,
+      );
 
       const result = await service.getBalance(username);
 
       expect(result).toEqual([{ currency: 'Bitcoin', balance: 100 }]);
       expect(userService.findOne).toHaveBeenCalledWith(username);
-      expect(transactionRepo.getUserBalanceByUsername).toHaveBeenCalledWith(username);
+      expect(transactionRepo.getUserBalanceByUsername).toHaveBeenCalledWith(
+        username,
+      );
     });
-
   });
 
   describe('getTopUsers', () => {
@@ -130,7 +148,9 @@ describe('TransactionsService', () => {
       const mockCurrencies = [{ name: 'Bitcoin' }, { name: 'Ethereum' }];
       const mockTopUsersBitcoin = [{ id: 1, username: 'user1' }];
       const mockTopUsersEthereum = [{ id: 2, username: 'user2' }];
-      jest.spyOn(service, 'transactionCurrencies').mockResolvedValue(mockCurrencies);
+      jest
+        .spyOn(service, 'transactionCurrencies')
+        .mockResolvedValue(mockCurrencies);
       (transactionRepo.queryTopUsers as jest.Mock)
         .mockResolvedValueOnce(mockTopUsersBitcoin)
         .mockResolvedValueOnce(mockTopUsersEthereum);
@@ -144,7 +164,6 @@ describe('TransactionsService', () => {
       expect(service.transactionCurrencies).toHaveBeenCalled();
       expect(transactionRepo.queryTopUsers).toHaveBeenCalledTimes(2);
     });
-
   });
 
   describe('getTopTransactions', () => {
@@ -154,7 +173,9 @@ describe('TransactionsService', () => {
       const mockTopTransactionsBitcoin = [{ id: 1, amount: 100 }];
       const mockTopTransactionsEthereum = [{ id: 2, amount: 200 }];
 
-      jest.spyOn(service, 'transactionCurrencies').mockResolvedValue(mockCurrencies);
+      jest
+        .spyOn(service, 'transactionCurrencies')
+        .mockResolvedValue(mockCurrencies);
       (transactionRepo.getTopTransaction as jest.Mock)
         .mockResolvedValueOnce(mockTopTransactionsBitcoin)
         .mockResolvedValueOnce(mockTopTransactionsEthereum);
@@ -167,10 +188,15 @@ describe('TransactionsService', () => {
       ]);
       expect(service.transactionCurrencies).toHaveBeenCalled();
       expect(transactionRepo.getTopTransaction).toHaveBeenCalledTimes(2);
-      expect(transactionRepo.getTopTransaction).toHaveBeenCalledWith(username, 'Bitcoin');
-      expect(transactionRepo.getTopTransaction).toHaveBeenCalledWith(username, 'Ethereum');
+      expect(transactionRepo.getTopTransaction).toHaveBeenCalledWith(
+        username,
+        'Bitcoin',
+      );
+      expect(transactionRepo.getTopTransaction).toHaveBeenCalledWith(
+        username,
+        'Ethereum',
+      );
     });
-
   });
 
   describe('findAll', () => {
@@ -181,13 +207,19 @@ describe('TransactionsService', () => {
       const search = 'test';
       const mockTransactions = [{ id: 1, amount: 100 }];
 
-      (transactionRepo.findAll as jest.Mock).mockResolvedValue(mockTransactions);
+      (transactionRepo.findAll as jest.Mock).mockResolvedValue(
+        mockTransactions,
+      );
 
       const result = await service.findAll(username, page, pageSize, search);
 
       expect(result).toEqual(mockTransactions);
-      expect(transactionRepo.findAll).toHaveBeenCalledWith(username, page, pageSize, search);
+      expect(transactionRepo.findAll).toHaveBeenCalledWith(
+        username,
+        page,
+        pageSize,
+        search,
+      );
     });
-
   });
 });

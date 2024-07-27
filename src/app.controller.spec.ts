@@ -16,7 +16,9 @@ describe('AppController', () => {
 
   describe('root', () => {
     it('should return "Hello World!, Welcome to Wallet Tranction API!"', () => {
-      expect(appController.getHello()).toBe('Hello World!, Welcome to Wallet Tranction API!');
+      expect(appController.getHello()).toBe(
+        'Hello World!, Welcome to Wallet Tranction API!',
+      );
     });
   });
 });

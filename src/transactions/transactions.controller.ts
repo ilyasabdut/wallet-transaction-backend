@@ -25,7 +25,7 @@ import * as Sentry from '@sentry/node';
 @ApiTags('Transactions')
 @ApiBearerAuth()
 export class TransactionsController {
-  constructor(private readonly transactionsService: TransactionsService) { }
+  constructor(private readonly transactionsService: TransactionsService) {}
 
   @Post('transfer')
   @ApiCreatedResponse({ type: TransactionEntity })

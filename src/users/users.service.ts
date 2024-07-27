@@ -45,7 +45,7 @@ export class UsersService {
     if (!user) {
       const error = new Error('User not found');
       console.log(error);
-      throw error;      
+      throw error;
     }
 
     return user;
