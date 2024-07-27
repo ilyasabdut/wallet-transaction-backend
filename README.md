@@ -24,23 +24,26 @@ This project provides a backend for a simple crypto wallet application using Nes
 The backend is built using NestJS, a popular Node.js framework. Prisma is used as an ORM to interact with the database. PostgreSQL is the chosen database for this project.
 
 ### Database Schema
-created using dbdiagram.io
+Created using dbdiagram.io
+
 ![alt text](image.png)
 
 ### Logger
-Using sentry.io as logger. Needs to setup these env variables for deployment
-SENTRY_DSN: 
-SENTRY_AUTH_TOKEN: 
-SENTRY_ORG: 
-SENTRY_PROJECT: 
+Using sentry.io as logger
 
 ### Deployment
 
 -Backend is deployed on Render.
 -Database is deployed on Neon.
 
-
 This repo uses Github Action as CI/CD. main.yaml could be found in .github/workflows/main.yaml
+
+### Testing
+
+Unit Test using Jest
+   
+   npm test --coverage
+
 
 ### Setup
 
@@ -59,7 +62,7 @@ This repo uses Github Action as CI/CD. main.yaml could be found in .github/workf
 
 3. **Create a `.env` File**
 
-   
+   APP_ENV="local"
    DATABASE_URL="postgresql://username:password@localhost:5432/yourdatabase"
    SECRET_KEY="yoursecretkey"
 
