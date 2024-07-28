@@ -82,3 +82,13 @@ Unit Test using Jest
    npm run start
    ```
    The application will start and be available at [http://localhost:3000](http://localhost:3000)
+
+
+### Future Improvements
+
+- Input validation using class-validators
+- Store JWT in cookies
+- API verify JWT
+- Refresh Token
+- Use Transaction Prisma for Create, Update and Delete APIs
+- Use ConfigOptions for ENV
