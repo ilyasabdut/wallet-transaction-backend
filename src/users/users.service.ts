@@ -10,8 +10,8 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     const { username, password, role } = createUserDto;
-
-    const getUser = await this.userRepo.getUserByUsername(username);
+    const usernameLowerCase = username.toLowerCase();
+    const getUser = await this.userRepo.getUserByUsername(usernameLowerCase);
 
     if (getUser) {
       throw new Error('User already exists');
@@ -26,7 +26,7 @@ export class UsersService {
     }
 
     const user = await this.userRepo.createUser({
-      username: username.toLowerCase(),
+      username: usernameLowerCase,
       password: hashedPassword,
       role: getRole.id,
     });

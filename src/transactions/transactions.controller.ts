@@ -102,6 +102,7 @@ export class TransactionsController {
   @ApiQuery({ name: 'pageSize', required: true, example: 10 })
   @ApiQuery({ name: 'search', required: false })
   @ApiOkResponse({ type: TransactionEntity, isArray: true })
+  
   async GetListTransaction(
     @Query() query: FindAllTransaction,
     @Res() res: Response,

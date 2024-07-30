@@ -18,7 +18,7 @@ export class AuthController {
   async signIn(@Body() signInDto: SignInDto, @Res() res: Response) {
     try {
       const access_token = await this.authService.signIn(
-        signInDto.username,
+        signInDto.username.toLowerCase(),
         signInDto.password,
       );
       return res.status(HttpStatus.OK).json({
