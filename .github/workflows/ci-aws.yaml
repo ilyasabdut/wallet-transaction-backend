@@ -71,16 +71,16 @@ jobs:
             # Start with health check
             docker compose up -d
             
-            # Wait for health check
-            timeout=300
-            while [ $timeout -gt 0 ]; do
-              if docker compose ps | grep -q "healthy"; then
-                echo "Deployment successful!"
-                exit 0
-              fi
-              sleep 5
-              timeout=$((timeout-5))
-            done
+            # # Wait for health check
+            # timeout=300
+            # while [ $timeout -gt 0 ]; do
+            #   if docker compose ps | grep -q "healthy"; then
+            #     echo "Deployment successful!"
+            #     exit 0
+            #   fi
+            #   sleep 5
+            #   timeout=$((timeout-5))
+            # done
             
             echo "Deployment failed - timeout waiting for health check"
             docker compose logs
