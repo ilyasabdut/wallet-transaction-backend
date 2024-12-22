@@ -1,37 +1,42 @@
-import * as Sentry from '@sentry/nestjs';
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+// import * as Sentry from '@sentry/nestjs';
+// import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { RequestMethod } from '@nestjs/common';
-import { SentryFilter } from './sentry.filter';
-import { nodeProfilingIntegration } from '@sentry/profiling-node';
+// import { SentryFilter } from './sentry.filter';
+// import { nodeProfilingIntegration } from '@sentry/profiling-node';
 
 async function bootstrap() {
-  Sentry.init({
-    release: 'v1',
-    dsn: process.env.SENTRY_DSN,
-    environment: 'production',
-    integrations: [
-      nodeProfilingIntegration(),
-      Sentry.prismaIntegration(),
-      Sentry.httpIntegration(),
-    ],
-    tracesSampleRate: 1.0,
+  // Sentry.init({
+  //   release: 'v1',
+  //   dsn: process.env.SENTRY_DSN,
+  //   environment: 'production',
+  //   integrations: [
+  //     nodeProfilingIntegration(),
+  //     Sentry.prismaIntegration(),
+  //     Sentry.httpIntegration(),
+  //   ],
+  //   tracesSampleRate: 1.0,
 
-    profilesSampleRate: 1.0,
-  });
+  //   profilesSampleRate: 1.0,
+  // });
 
   const app = await NestFactory.create(AppModule);
-  const { httpAdapter } = app.get(HttpAdapterHost);
+  // const { httpAdapter } = app.get(HttpAdapterHost);
 
   app.setGlobalPrefix('api', {
     exclude: [{ path: '/', method: RequestMethod.GET }],
   });
 
-  app.enableCors();
+  app.enableCors({
+    origin: '*', // Allow all origins
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS', // Allowed HTTP methods
+    credentials: true, // Include credentials if needed
+});
 
-  Sentry.setupNestErrorHandler(app, new SentryFilter(httpAdapter));
-  app.useGlobalFilters(new SentryFilter(httpAdapter));
+  // Sentry.setupNestErrorHandler(app, new SentryFilter(httpAdapter));
+  // app.useGlobalFilters(new SentryFilter(httpAdapter));
 
   if (process.env.APP_ENV == 'local') {
     const config = new DocumentBuilder()
