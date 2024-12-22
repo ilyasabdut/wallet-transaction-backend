@@ -1,9 +1,12 @@
-import * as Sentry from '@sentry/node';
-import { Controller, Get, Res, HttpStatus, Param } from '@nestjs/common';
+// import * as Sentry from '@sentry/node';
+import { Controller, Get, Res, HttpStatus, Param} from '@nestjs/common';
 import { CurrenciesService } from './currencies.service';
 import { Response } from 'express';
 import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
-@ApiBearerAuth()
+import { SkipAuth } from 'src/helper/helper';
+
+// @ApiBearerAuth()
+@SkipAuth()
 @Controller('masterdata/currencies')
 export class CurrenciesController {
   constructor(private readonly currenciesService: CurrenciesService) {}
@@ -19,7 +22,7 @@ export class CurrenciesController {
         data: currency,
       });
     } catch (error) {
-      Sentry.captureException(error);
+      // Sentry.captureException(error);
 
       return res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
@@ -39,7 +42,7 @@ export class CurrenciesController {
         data: currency,
       });
     } catch (error) {
-      Sentry.captureException(error);
+      // Sentry.captureException(error);
 
       return res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,

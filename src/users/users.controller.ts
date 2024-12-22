@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/node';
+// import * as Sentry from '@sentry/node';
 import {
   Controller,
   Get,
@@ -42,7 +42,7 @@ export class UsersController {
         data: user,
       });
     } catch (error) {
-      Sentry.captureException(error);
+      // Sentry.captureException(error);
       return res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
@@ -61,7 +61,7 @@ export class UsersController {
         data: users,
       });
     } catch (error) {
-      Sentry.captureException(error);
+      // Sentry.captureException(error);
       res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
@@ -80,7 +80,7 @@ export class UsersController {
         data: user,
       });
     } catch (error) {
-      Sentry.captureException(error);
+      // Sentry.captureException(error);
       res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
@@ -103,7 +103,7 @@ export class UsersController {
         data: user,
       });
     } catch (error) {
-      Sentry.captureException(error);
+      // Sentry.captureException(error);
       res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
@@ -122,7 +122,7 @@ export class UsersController {
         data: user,
       });
     } catch (error) {
-      Sentry.captureException(error);
+      // Sentry.captureException(error);
       res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
         message: error.message,
