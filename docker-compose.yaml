@@ -1,0 +1,17 @@
+version: '3.9'
+
+name: wallet-transaction
+services:
+  wallet-backend:
+    build: 
+        context: .
+        dockerfile: Dockerfile
+    platform: linux/amd64
+    container_name: wallet-backend
+    environment:
+      - SECRET_KEY="CryptoWalletTransactionInsigniaIlyasAbduttawab"
+      - DATABASE_URL=postgresql://user:password@postgres:5432/crypto-wallet-transaction-db
+      - SENTRY_DSN="https://c7e5d8bb46902a7439bb57f97cfa87bb@o4507669027815424.ingest.us.sentry.io/4507669035286528"
+      - SENTRY_AUTH_TOKEN="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"
+    ports:
+      - "3000:3000"
