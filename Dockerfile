@@ -1,4 +1,4 @@
-FROM node:21-alpine
+FROM oven/bun:alpine
 
 WORKDIR /app
 
@@ -12,17 +12,16 @@ COPY package*.json ./
 COPY prisma ./prisma
 
 # Install dependencies
-RUN npm ci && npm cache clean --force
+RUN bun install
 
 # Copy application code
 COPY . .
 
 # Generate Prisma client and build
-RUN npx prisma generate && \
-    npm run build
+RUN bun prisma generate && bun run build
 
 # Expose port
 EXPOSE 3000
 
 # Start the application
-CMD ["npm", "run", "start:prod"]
+CMD ["bun", "run", "start:prod"]
