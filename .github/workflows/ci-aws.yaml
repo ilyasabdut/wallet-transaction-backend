@@ -51,6 +51,21 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install global dependencies
+        run: |
+          # Install NestJS CLI, Prisma, and ts-node globally
+          bun add -g @nestjs/cli prisma ts-node
+          # Install project dependencies
+          bun install
+
+      - name: Run Prisma Migrations
+        run: |
+          echo "Running Prisma Migrations"
+          bun prisma migrate deploy
+
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
@@ -64,11 +79,13 @@ jobs:
             # Login to ECR
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
             
-            # Graceful shutdown
+            # Pull the latest Docker images
             docker compose pull
+            
+            # Gracefully shut down previous containers
             docker compose down --remove-orphans
             
-            # Start with health check
+            # Start the application with health check
             docker compose up -d
             
             # Basic error check
