@@ -1,61 +1,55 @@
-# Stage 1: Build Stage (Generate Prisma client & Build application)
+# Stage 1: Build Stage
+# Use node:20-alpine as the base image for the build stage
 FROM oven/bun:alpine AS builder
 
+# Set the working directory inside the container
 WORKDIR /app
 
-# Install necessary build dependencies (only for the build stage)
-RUN apk update && \
-    apk add --no-cache build-base python3 make gcc libssl3 curl
-
-# Copy package files and Prisma schema
-COPY package*.json ./
-
-COPY bun.lockb ./
-
-COPY prisma ./prisma
-
-# Install all dependencies (including dev dependencies for build)
-RUN bun install --frozen-lockfile
-
-# Copy application code
+# Copy all files from the host to the container
 COPY . .
 
-# Generate Prisma client (for runtime)
-RUN bun prisma generate
+# Install dependencies
+RUN bun install --frozen-lockfile
 
-# Build the application
+# Run the build script defined in package.json
 RUN bun run build
 
-# Stage 2: Prune Stage (Clean unnecessary files)
+# Remove node_modules to prepare for a clean production install
+RUN rm -rf node_modules
+
+# Install only production dependencies
+RUN bun install --omit=dev
+
+# Stage 2: Prune Stage
+# Use golang:1.22.0-alpine as the base image for the prune stage
 FROM golang:1.22.0-alpine AS prune
 
-WORKDIR /app
+# Set the working directory inside the container
+WORKDIR /usr/src/app
 
-# Install node-prune
+# Copy the build output and dependencies from the build stage
+COPY --from=build /app/dist/ /app/dist/
+COPY --from=build /app/node_modules/ /app/node_modules/
+COPY --from=build /app/package*.json /app/
+
+# Install node-prune to remove unnecessary files
 RUN go install github.com/tj/node-prune@latest
 
-# Copy application files from the build stage
-COPY --from=builder /app /app
-
-# Run node-prune to clean unnecessary files from node_modules
+# Run node-prune to remove unnecessary files from node_modules
 RUN node-prune
 
-# Stage 3: Production Runtime Stage (with minimal runtime dependencies)
-FROM oven/bun:alpine AS runtime
+# Stage 3: Production Stage
+# Use node:20-alpine as the base image for the production stage
+FROM node:20-alpine as production
 
-WORKDIR /app
+# Set the working directory inside the container
+WORKDIR /usr/src/app
 
-# Install only necessary runtime dependencies (no build dependencies)
-RUN apk update && apk add --no-cache libssl3 curl
+# Copy the pruned application files from the prune stage
+COPY --from=prune /usr/src/app /usr/src/app
 
-# Copy the pruned application from the prune stage
-COPY --from=prune /app /app
-
-# Install only production dependencies (no dev dependencies)
-RUN bun install --production
-
-# Expose the application port
+# Expose port 3000 to the host
 EXPOSE 3000
 
-# Default command for running the app
-CMD ["bun", "run", "start:prod"]
+# Define the command to run the application
+CMD ["node", "dist/main"]

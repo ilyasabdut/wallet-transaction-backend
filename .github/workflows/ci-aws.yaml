@@ -56,6 +56,7 @@ jobs:
 
       - name: Install global dependencies
         run: |
+          bun init
           # Install NestJS CLI, Prisma, and ts-node globally
           bun add -g @nestjs/cli prisma ts-node
           # Install project dependencies
