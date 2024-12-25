@@ -3,7 +3,7 @@ import { Controller, Get, Res, HttpStatus, Param} from '@nestjs/common';
 import { CurrenciesService } from './currencies.service';
 import { Response } from 'express';
 import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
-import { SkipAuth } from 'src/helper/helper';
+import { SkipAuth } from '../../helper/helper';
 
 // @ApiBearerAuth()
 @SkipAuth()

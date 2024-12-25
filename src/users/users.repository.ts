@@ -1,6 +1,6 @@
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { userSelect } from 'src/prisma/prisma.selects';
+import { userSelect } from '../prisma/prisma.selects';
 
 @Injectable()
 export class UserRepository {

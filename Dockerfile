@@ -1,55 +1,41 @@
-# Stage 1: Build Stage
-# Use node:20-alpine as the base image for the build stage
 FROM oven/bun:alpine AS builder
 
-# Set the working directory inside the container
+ENV NODE_ENV production
+
 WORKDIR /app
 
-# Copy all files from the host to the container
-COPY . .
+# Install necessary build dependencies
+RUN apk update && \
+    apk add --no-cache build-base python3 make gcc libssl3 curl
+
+# Copy package files
+COPY package*.json ./
+COPY bun.lockb ./
+COPY prisma ./prisma
 
 # Install dependencies
 RUN bun install --frozen-lockfile
 
-# Run the build script defined in package.json
-RUN bun run build
+# Copy application code
+COPY . .
 
-# Remove node_modules to prepare for a clean production install
-RUN rm -rf node_modules
+# Generate Prisma client and build
+RUN bun prisma generate && bun run build
 
-# Install only production dependencies
-RUN bun install --omit=dev
+FROM oven/bun:alpine
 
-# Stage 2: Prune Stage
-# Use golang:1.22.0-alpine as the base image for the prune stage
-FROM golang:1.22.0-alpine AS prune
+WORKDIR /app
 
-# Set the working directory inside the container
-WORKDIR /usr/src/app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/tsconfig.json ./
+COPY --from=builder /app/tsconfig.build.json ./
+COPY --from=builder /app/tsconfig.build.tsbuildinfo ./
+COPY --from=builder /app/prisma ./prisma
 
-# Copy the build output and dependencies from the build stage
-COPY --from=build /app/dist/ /app/dist/
-COPY --from=build /app/node_modules/ /app/node_modules/
-COPY --from=build /app/package*.json /app/
-
-# Install node-prune to remove unnecessary files
-RUN go install github.com/tj/node-prune@latest
-
-# Run node-prune to remove unnecessary files from node_modules
-RUN node-prune
-
-# Stage 3: Production Stage
-# Use node:20-alpine as the base image for the production stage
-FROM node:20-alpine as production
-
-# Set the working directory inside the container
-WORKDIR /usr/src/app
-
-# Copy the pruned application files from the prune stage
-COPY --from=prune /usr/src/app /usr/src/app
-
-# Expose port 3000 to the host
+# Expose port
 EXPOSE 3000
 
-# Define the command to run the application
-CMD ["node", "dist/main"]
+# Start the application
+CMD ["bun", "run", "start:prod"]

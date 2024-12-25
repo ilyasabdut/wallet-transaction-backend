@@ -4,7 +4,7 @@ import { ApiBadRequestResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignInEntity } from './entities/sign-in.entities';
 import { Response } from 'express';
-import { SkipAuth } from 'src/helper/helper';
+import { SkipAuth } from '../helper/helper';
 
 @Controller('auth')
 @ApiTags('Auth')

@@ -21,7 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { Response } from 'express';
-import { SkipAuth } from 'src/helper/helper';
+import { SkipAuth } from '../helper/helper';
 
 @Controller('users')
 @ApiTags('Users')

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { TransactionRepository } from './transaction.repository';
-import { CurrenciesService } from 'src/masterdatas/currencies/currencies.service';
-import { UsersService } from 'src/users/users.service';
+import { CurrenciesService } from '../masterdatas/currencies/currencies.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class TransactionsService {
