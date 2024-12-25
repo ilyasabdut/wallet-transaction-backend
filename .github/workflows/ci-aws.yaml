@@ -60,9 +60,11 @@ jobs:
           bun install --frozen-lockfile
 
       - name: Run Prisma Migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           echo "Running Prisma Migrations"
-          bun prisma migrate deploy && bun run seed
+          bunx prisma migrate deploy && bun run seed
 
   deployment:
     needs: migrate
