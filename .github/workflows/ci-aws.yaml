@@ -94,6 +94,5 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-            cd docker
             echo "Running Prisma Migrations"
             docker exec wallet-backend bunx prisma migrate deploy && bun run seed
