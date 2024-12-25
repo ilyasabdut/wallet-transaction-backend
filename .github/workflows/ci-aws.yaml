@@ -90,11 +90,25 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Run Prisma Migrations
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
+        with:
+          host: ${{ secrets.SERVER_HOSTNAME }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          port: ${{ secrets.SERVER_PORT }}
+          key: ${{ secrets.SERVER_KEY }}
+          command_timeout: 25m
+          script: |
             docker ps -a
             echo "Running Prisma Migrations"
             docker exec wallet-backend bunx prisma migrate deploy
             docker exec wallet-backend bun run seed
+            
+            # Basic error check
+            if [ $? -ne 0 ]; then
+              echo "Deployment failed"
+              docker-compose logs
+              exit 1
+            fi
