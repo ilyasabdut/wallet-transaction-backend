@@ -33,7 +33,7 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=disaled
           tags: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/wallet-transaction:development
           labels: |
             org.opencontainers.image.revision=${{ github.sha }}
