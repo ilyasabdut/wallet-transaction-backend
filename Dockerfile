@@ -55,6 +55,7 @@ COPY --from=prune /app/node_modules /app/node_modules
 COPY --from=prune /app/dist /app/dist
 COPY --from=prune /app/package*.json ./
 COPY --from=prune /app/prisma ./prisma
+COPY --from=builder /app/tsconfig*.json /app/
 
 # Expose port
 EXPOSE 3000
