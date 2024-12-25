@@ -37,35 +37,6 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 
-  migrate:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    environment: aws-dev
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_SECRET_ACCESS_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v2
-
-      - name: Install global dependencies
-        run: |
-          bun init
-          bun install --frozen-lockfile
-
-      - name: Run Prisma Migrations
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
-          echo "Listing project files"
-          ls -la
-          echo "Running Prisma Migrations"
-          bunx prisma migrate deploy && bun run seed
-
   deployment:
     needs: migrate
     runs-on: ubuntu-latest
@@ -106,3 +77,23 @@ jobs:
               docker-compose logs
               exit 1
             fi
+
+  migrate:
+    needs: deployment
+    runs-on: ubuntu-latest
+    environment: aws-dev
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_SECRET_ACCESS_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Run Prisma Migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+            cd docker
+            echo "Running Prisma Migrations"
+            docker exec wallet-backend bunx prisma migrate deploy && bun run seed
