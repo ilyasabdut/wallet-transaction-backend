@@ -63,6 +63,8 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
+          echo "Listing project files"
+          ls -la
           echo "Running Prisma Migrations"
           bunx prisma migrate deploy && bun run seed
 
