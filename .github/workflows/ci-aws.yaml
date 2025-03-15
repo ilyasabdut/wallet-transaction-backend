@@ -78,7 +78,7 @@ jobs:
               exit 1
             fi
 
-  migrate:
+  migration:
     needs: deployment
     runs-on: ubuntu-latest
     environment: aws-dev
@@ -90,7 +90,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Deploy to EC2
+      - name: Migration inside EC2
         uses: appleboy/ssh-action@master
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}

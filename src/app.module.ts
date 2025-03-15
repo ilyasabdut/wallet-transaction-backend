@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { CurrenciesModule } from './masterdatas/currencies/currencies.module';
 import { AuthModule } from './auth/auth.module';
+import { ExternalApisModule } from './external-apis/external-apis.module';
 // import { SentryModule } from '@sentry/nestjs/setup';
 
 @Module({
@@ -14,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
     UsersModule,
     TransactionsModule,
     CurrenciesModule,
+    ExternalApisModule,
     AuthModule,
     // SentryModule.forRoot(),
   ],
